@@ -88,19 +88,7 @@ textarea{resize:vertical;min-height:70px;line-height:1.5;}
 .btn:disabled{opacity:.45;cursor:not-allowed;}
 .btn-row{display:flex;gap:10px;margin-top:1.4rem;flex-wrap:wrap;}
 
-/* GENERATING SCREEN */
-.gen-screen{text-align:center;padding:3rem 1rem;}
-.gen-spinner{width:60px;height:60px;border:3px solid var(--paper3);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1.5rem;}
-@keyframes spin{to{transform:rotate(360deg);}}
-.gen-screen h2{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;color:var(--ink);margin-bottom:.6rem;}
-.gen-screen p{color:var(--ink3);font-size:.9rem;line-height:1.7;max-width:400px;margin:0 auto;}
-.gen-steps{display:flex;flex-direction:column;gap:8px;max-width:320px;margin:1.5rem auto 0;text-align:left;}
-.gen-step{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink3);padding:6px 0;}
-.gen-step.active{color:var(--ink);font-weight:500;}
-.gen-step.done{color:var(--grn);}
-.gen-step-icon{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--paper3);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
-.gen-step.active .gen-step-icon{border-color:var(--gold);background:var(--goldl);color:var(--goldd);}
-.gen-step.done .gen-step-icon{border-color:var(--grn);background:var(--grnl);color:var(--grn);}
+
 
 /* RESULT SCREEN */
 .result-screen{}
@@ -140,13 +128,12 @@ footer a{color:rgba(255,255,255,.5);text-decoration:none;}
 <section class="hero">
   <p class="hero-pre">Custom Invitation Printing &mdash; Philippines</p>
   <h1>Your event deserves<br/><em>a beautiful invitation</em></h1>
-  <p>Order custom invitations online. AI generates a design preview instantly &mdash; we print and deliver.</p>
+  <p>Order custom invitations online. Fill in your event details, choose a style, and submit &mdash; we design and print it for you.</p>
   <div class="steps-row">
     <div class="sp"><span class="n">1</span>Choose event</div>
     <div class="sp"><span class="arr">&#8250;</span><span class="n">2</span>Pick style</div>
     <div class="sp"><span class="arr">&#8250;</span><span class="n">3</span>Fill details</div>
-    <div class="sp"><span class="arr">&#8250;</span><span class="n">4</span>Auto-generate preview</div>
-    <div class="sp"><span class="arr">&#8250;</span><span class="n">5</span>Submit &amp; confirm</div>
+    <div class="sp"><span class="arr">&#8250;</span><span class="n">4</span>Submit order</div>
   </div>
 </section>
 
@@ -155,13 +142,12 @@ footer a{color:rgba(255,255,255,.5);text-decoration:none;}
     <div class="ps active" id="ps1">1 &middot; Event</div>
     <div class="ps" id="ps2">2 &middot; Style</div>
     <div class="ps" id="ps3">3 &middot; Details</div>
-    <div class="ps" id="ps4">4 &middot; Preview</div>
-    <div class="ps" id="ps5">5 &middot; Submit</div>
+    <div class="ps" id="ps4">4 &middot; Review &amp; Submit</div>
   </div>
 
   <!-- S1: EVENT -->
   <div id="s1">
-    <div class="step-hdr"><div class="tag">Step 1 of 5</div><h2>What is the occasion?</h2></div>
+    <div class="step-hdr"><div class="tag">Step 1 of 4</div><h2>What is the occasion?</h2></div>
     <div class="event-grid">
       <div class="ec" onclick="pickEvent('wedding',this)"><div class="ec-icon">&#128141;</div><div class="ec-name">Wedding</div><div class="ec-desc">Reception, ceremony</div></div>
       <div class="ec" onclick="pickEvent('debut',this)"><div class="ec-icon">&#127801;</div><div class="ec-name">Debut / Sweet 18</div><div class="ec-desc">18th birthday ball</div></div>
@@ -181,7 +167,7 @@ footer a{color:rgba(255,255,255,.5);text-decoration:none;}
 
   <!-- S2: TEMPLATE -->
   <div id="s2" class="hidden">
-    <div class="step-hdr"><div class="tag">Step 2 of 5</div><h2>Choose your invitation style</h2><p>The AI will generate a full invitation design in this style.</p></div>
+    <div class="step-hdr"><div class="tag">Step 2 of 4</div><h2>Choose your invitation style</h2><p>We will design your invitation in this style after you submit your order.</p></div>
     <div class="tpl-grid" id="tpl-grid"></div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="goStep(1)">&larr; Back</button>
@@ -191,7 +177,7 @@ footer a{color:rgba(255,255,255,.5);text-decoration:none;}
 
   <!-- S3: FORM -->
   <div id="s3" class="hidden">
-    <div class="step-hdr"><div class="tag">Step 3 of 5</div><h2>Fill in your event details</h2><p>Complete the form below. The AI will use these to generate your invitation.</p></div>
+    <div class="step-hdr"><div class="tag">Step 3 of 4</div><h2>Fill in your event details</h2><p>Complete the form below. Reymar will personally design your invitation based on these details.</p></div>
     <div class="order-form">
       <div class="fs">
         <div class="fs-title">&#128100; Your contact information</div>
@@ -230,50 +216,23 @@ footer a{color:rgba(255,255,255,.5);text-decoration:none;}
     </div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="goStep(2)">&larr; Back</button>
-      <button class="btn btn-gold" onclick="goGenerate()">&#10022; Generate my invitation preview &rarr;</button>
+      <button class="btn btn-gold" onclick="goReview()">Review my order &rarr;</button>
     </div>
   </div>
 
-  <!-- S4: GENERATING -->
+  <!-- S4: REVIEW & SUBMIT -->
   <div id="s4" class="hidden">
-    <div class="gen-screen">
-      <div class="gen-spinner"></div>
-      <h2>Creating your invitation&hellip;</h2>
-      <p>Our AI designer is building your custom invitation based on your event details and chosen style.</p>
-      <div class="gen-steps">
-        <div class="gen-step" id="gs1"><div class="gen-step-icon">1</div>Reading your event details</div>
-        <div class="gen-step" id="gs2"><div class="gen-step-icon">2</div>Applying your chosen style</div>
-        <div class="gen-step" id="gs3"><div class="gen-step-icon">3</div>Designing the layout</div>
-        <div class="gen-step" id="gs4"><div class="gen-step-icon">4</div>Finalizing print-ready output</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- S5: PREVIEW + SUBMIT -->
-  <div id="s5" class="hidden">
-    <div class="step-hdr"><div class="tag">Step 4 of 5 &mdash; Preview</div><h2>Your invitation preview</h2><p>This is the AI-generated design. After submitting, Reymar will finalize and print it.</p></div>
-    <div class="result-toolbar">
-      <div class="result-toolbar-left">
-        <span class="result-ref" id="prev-ref"></span>
-        <span style="font-size:12px;color:var(--ink3);" id="prev-info"></span>
-      </div>
-      <div class="result-toolbar-right">
-        <button class="btn btn-ghost" style="padding:7px 14px;font-size:12px;" onclick="regenInvite()">&#8635; Regenerate</button>
-        <button class="btn btn-ghost" style="padding:7px 14px;font-size:12px;" onclick="printPreview()">&#128424; Print preview</button>
-      </div>
-    </div>
-    <div class="preview-wrap">
-      <iframe id="inv-frame" title="Invitation preview"></iframe>
-    </div>
-    <div class="notice" style="margin-top:1.2rem;">&#9432; This is an AI-generated preview. The final printed version will be professionally reviewed and refined by Reymar before printing.</div>
+    <div class="step-hdr"><div class="tag">Step 4 of 4</div><h2>Review your order</h2><p>Please check all details before submitting. Reymar will contact you within 24 hours to confirm your design.</p></div>
+    <div class="notice">&#9432; After submitting, Reymar will personally design your invitation based on your chosen style and details, then contact you to show the design proof before printing.</div>
+    <div id="review-card" style="background:#fff;border:1px solid var(--paper3);border-radius:14px;padding:1.8rem;box-shadow:var(--sh);margin-bottom:1.5rem;"></div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="goStep(3)">&larr; Edit details</button>
-      <button class="btn btn-gold" onclick="submitOrder()">&#10022; Submit this order &rarr;</button>
+      <button class="btn btn-gold" onclick="submitOrder()">&#10022; Submit order &rarr;</button>
     </div>
   </div>
 
   <!-- S6: SUCCESS -->
-  <div id="s6" class="hidden">
+  <div id="s5" class="hidden">
     <div class="success-box">
       <div style="font-size:3rem;margin-bottom:1rem;">&#127881;</div>
       <h3>Order submitted!</h3>
@@ -424,7 +383,68 @@ function collectAll(){
   return v;
 }
 
-// ── GENERATE INVITATION ──────────────────────────────────────────
+// ── REVIEW ───────────────────────────────────────────────────────
+function goReview(){
+  if(!validateStep3()) return;
+  buildReviewCard();
+  goStep(4);
+}
+
+function buildReviewCard(){
+  const v=collectAll();
+  const eventNames={wedding:'Wedding',debut:'Debut / Sweet 18',birthday:'Birthday',christening:'Christening',babyshower:'Baby Shower',graduation:'Graduation',anniversary:'Anniversary',reunion:'Reunion',corporate:'Corporate Event',fiesta:'Fiesta / Party',kasalan:'Kasalan sa Simbahan',other:'Custom Event'};
+  const tpl=TEMPLATES.find(x=>x.id===state.template);
+  const lbls={'c-name':'Full name','c-phone':'Mobile','c-email':'Email','c-city':'City',
+    'e-groom':'Groom','e-bride':'Bride','e-pgroom':"Groom's parents",'e-pbride':"Bride's parents",
+    'e-name':'Celebrant','e-nick':'Nickname','e-age':'Age','e-parents':'Parents',
+    'e-baby':'Baby name','e-mom':'Mom-to-be','e-host':'Hosted by','e-husband':'Husband','e-wife':'Wife',
+    'e-years':'Years married','e-degree':'Degree','e-school':'School','e-company':'Company',
+    'e-event':'Event name','e-group':'Group name','e-date':'Date','e-time':'Time',
+    'e-church':'Church','e-reception':'Reception venue','e-rtime':'Reception time',
+    'e-venue':'Venue','e-dress':'Dress code','e-sponsors':'Sponsors / Ninong / Ninang',
+    'e-ninong':'Godparents','e-rsvp':'RSVP contact','e-rsvpdate':'RSVP deadline',
+    'e-msg':'Special message','e-18':'18 roses / candles','e-theme':'Theme',
+    'e-patron':'Patron / Theme','e-program':'Program','e-type':'Type',
+    'e-from':'Invited by','e-origdate':'Original date','e-org':'Organizer',
+    'e-rtype':'Reunion type','e-desc':'Description','e-party':'Party details',
+    'e-pvenue':'Party venue',
+    'o-qty':'Quantity','o-color':'Color preference','o-delivery':'Delivery','o-notes':'Notes'};
+
+  const sections = [
+    { title:'&#127881; Event & style', rows:[
+      ['Event type', eventNames[state.event]||state.event],
+      ['Invitation style', tpl?tpl.name:'—'],
+      ['Paper size', 'A5 (148mm × 210mm)'],
+    ]},
+    { title:'&#128100; Contact information', rows:
+      ['c-name','c-phone','c-email','c-city'].map(k=>[lbls[k]||k, v[k]||'—'])
+    },
+    { title:'&#128197; Event details', rows:
+      Object.entries(v).filter(([k])=>k.startsWith('e-')).map(([k,val])=>[lbls[k]||k, val])
+    },
+    { title:'&#128220; Order specifications', rows:
+      [['Quantity', (v['o-qty']||'50')+' pcs · A5 size'],
+       ['Color preference', v['o-color']||'—'],
+       ['Delivery', v['o-delivery']||'Pick up'],
+       ['Notes', v['o-notes']||'—']]
+    }
+  ];
+
+  const card = document.getElementById('review-card');
+  card.innerHTML = sections.map(sec=>`
+    <div style="margin-bottom:1.4rem;">
+      <div style="font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:.8rem;">${sec.title}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        ${sec.rows.filter(([,v])=>v&&v!=='—').map(([l,v])=>`
+          <div style="${String(v).length>35?'grid-column:1/-1;':''}">
+            <div style="font-size:11px;color:var(--ink3);">${l}</div>
+            <div style="font-size:13px;color:var(--ink);font-weight:500;word-break:break-word;">${v}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('<hr style="border:none;border-top:1px solid var(--paper2);margin-bottom:1.4rem;"/>');
+}
+
+// ── GENERATE (kept for admin use only — no longer called from customer site) ──
 async function goGenerate(){
   if(!validateStep3()) return;
   goStep(4);
@@ -570,7 +590,7 @@ function submitOrder(){
     status:'New'
   });
   localStorage.setItem('if_orders',JSON.stringify(orders));
-  goStep(6);
+  goStep(5);
 }
 
 function resetFlow(){
