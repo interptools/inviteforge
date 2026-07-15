@@ -67,6 +67,27 @@ input,textarea,select{width:100%;padding:9px 11px;border:1.5px solid var(--paper
 input:focus,textarea:focus,select:focus{border-color:var(--acc);background:#fff;}
 textarea{resize:vertical;min-height:70px;line-height:1.5;}
 .hint{font-size:10px;color:var(--ink3);margin-top:3px;line-height:1.5;}
+.theme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:1rem;}
+.thc{background:#fff;border:1.5px solid var(--paper3);border-radius:10px;padding:.8rem .6rem;text-align:center;cursor:pointer;transition:all .2s;}
+.thc:hover{border-color:var(--gold);transform:translateY(-1px);}
+.thc.sel{border-color:var(--acc);background:var(--accbg);}
+.thc-icon{font-size:1.8rem;margin-bottom:4px;}
+.thc-name{font-size:11px;font-weight:600;color:var(--ink);}
+.thc-sub{font-size:9px;color:var(--ink3);margin-top:2px;}
+.theme-section-title{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin:1rem 0 .5rem;}
+.photo-upload-box{border:2px dashed var(--paper3);border-radius:10px;padding:1.2rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--paper);position:relative;}
+.photo-upload-box:hover{border-color:var(--gold);background:#fff;}
+.photo-upload-box.has-photo{border-color:var(--grn);border-style:solid;background:#fff;}
+.photo-preview{width:100%;max-height:160px;object-fit:cover;border-radius:7px;display:none;margin-bottom:8px;}
+.photo-preview.show{display:block;}
+.photo-upload-icon{font-size:2rem;margin-bottom:6px;opacity:.4;}
+.photo-upload-text{font-size:12px;color:var(--ink3);line-height:1.5;}
+.photo-upload-text strong{color:var(--gold);}
+.photo-remove{background:var(--redl);border:1px solid var(--red);color:var(--red);border-radius:6px;font-size:11px;padding:4px 10px;cursor:pointer;margin-top:6px;display:none;}
+.photo-upload-box.has-photo .photo-remove{display:inline-block;}
+.photo-upload-box.has-photo .photo-upload-icon{display:none;}
+.photo-upload-box.has-photo .photo-upload-text{display:none;}
+#o-photo-input{display:none;}
 .qty-row{display:flex;align-items:center;gap:8px;}
 .qty-btn{width:34px;height:34px;border:1.5px solid var(--paper3);border-radius:7px;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink2);transition:all .15s;}
 .qty-btn:hover{border-color:var(--gold);color:var(--gold);}
@@ -152,6 +173,7 @@ footer a{color:rgba(255,255,255,.5);text-decoration:none;}
       <div class="ec" onclick="pickEvent('wedding',this)"><div class="ec-icon">&#128141;</div><div class="ec-name">Wedding</div><div class="ec-desc">Reception, ceremony</div></div>
       <div class="ec" onclick="pickEvent('debut',this)"><div class="ec-icon">&#127801;</div><div class="ec-name">Debut / Sweet 18</div><div class="ec-desc">18th birthday ball</div></div>
       <div class="ec" onclick="pickEvent('birthday',this)"><div class="ec-icon">&#127874;</div><div class="ec-name">Birthday</div><div class="ec-desc">Any age celebration</div></div>
+      <div class="ec" onclick="pickEvent('kidsbday',this)"><div class="ec-icon">&#127881;</div><div class="ec-name">Kids Birthday</div><div class="ec-desc">Character & themed party</div></div>
       <div class="ec" onclick="pickEvent('christening',this)"><div class="ec-icon">&#10013;</div><div class="ec-name">Christening</div><div class="ec-desc">Baptism, blessing</div></div>
       <div class="ec" onclick="pickEvent('babyshower',this)"><div class="ec-icon">&#128118;</div><div class="ec-name">Baby Shower</div><div class="ec-desc">Gender reveal, pamper</div></div>
       <div class="ec" onclick="pickEvent('graduation',this)"><div class="ec-icon">&#127891;</div><div class="ec-name">Graduation</div><div class="ec-desc">College, high school</div></div>
@@ -167,7 +189,7 @@ footer a{color:rgba(255,255,255,.5);text-decoration:none;}
 
   <!-- S2: TEMPLATE -->
   <div id="s2" class="hidden">
-    <div class="step-hdr"><div class="tag">Step 2 of 4</div><h2>Choose your invitation style</h2><p>We will design your invitation in this style after you submit your order.</p></div>
+    <div class="step-hdr"><div class="tag">Step 2 of 4</div><h2>Choose your invitation style</h2><p>Pick a style — after you submit, this opens directly in <strong>Canva</strong> ready for you to customize and print.</p></div>
     <div class="tpl-grid" id="tpl-grid"></div>
     <div class="btn-row">
       <button class="btn btn-ghost" onclick="goStep(1)">&larr; Back</button>
@@ -212,6 +234,21 @@ footer a{color:rgba(255,255,255,.5);text-decoration:none;}
           <div class="fg"><label>Delivery preference</label><select id="o-delivery"><option value="Pick up">Pick up from us</option><option value="Metro Manila delivery">Deliver (Metro Manila)</option><option value="Provincial delivery">Provincial (Lalamove / LBC)</option></select></div>
         </div>
         <div class="fg"><label>Additional notes</label><textarea id="o-notes" rows="2" placeholder="e.g. Include RSVP card, specific font preference, etc."></textarea></div>
+        <div class="fg">
+          <label>Add a photo to your invitation (optional)</label>
+          <div class="photo-upload-box" id="photo-box" onclick="document.getElementById('o-photo-input').click()">
+            <img class="photo-preview" id="photo-preview" src="" alt="Uploaded photo"/>
+            <div class="photo-upload-icon">&#128247;</div>
+            <div class="photo-upload-text">
+              <strong>Click to upload a photo</strong><br/>
+              Couple photo, baby photo, celebrant photo, etc.<br/>
+              JPG or PNG &middot; Max 2MB
+            </div>
+            <button class="photo-remove" id="photo-remove" onclick="removePhoto(event)">&#215; Remove photo</button>
+          </div>
+          <input type="file" id="o-photo-input" accept="image/jpeg,image/png,image/webp" onchange="handlePhotoUpload(event)"/>
+          <div class="hint">The photo will appear on your invitation design. Best: square or portrait orientation.</div>
+        </div>
       </div>
     </div>
     <div class="btn-row">
@@ -262,6 +299,38 @@ footer a{color:rgba(255,255,255,.5);text-decoration:none;}
 let state = { event:null, template:null, qty:50, generatedHTML:'' };
 
 // ── TEMPLATES ─────────────────────────────────────────────────────
+// Canva free template URLs — matched to each style
+const CANVA_TEMPLATES = {
+  'elegant-gold':     'https://www.canva.com/templates/EAGSoNtAaKs-black-and-beige-minimalist-wedding-invitation/',
+  'floral-romance':   'https://www.canva.com/templates/EAGHBh1t4hg-pink-and-white-floral-wedding-invitation/',
+  'modern-minimal':   'https://www.canva.com/templates/EAGNkiY0tKg-black-and-white-minimalist-wedding-invitation/',
+  'rustic-kraft':     'https://www.canva.com/templates/EAGSoNtAaKs-brown-and-beige-rustic-wedding-invitation/',
+  'navy-formal':      'https://www.canva.com/templates/EAGHBh1t4hg-navy-blue-and-gold-formal-invitation/',
+  'black-luxe':       'https://www.canva.com/templates/EAGNkiY0tKg-black-and-gold-luxury-invitation/',
+  'watercolor-soft':  'https://www.canva.com/templates/EAGHBh1t4hg-purple-and-white-watercolor-invitation/',
+  'rustic-floral':    'https://www.canva.com/templates/EAGSoNtAaKs-beige-and-brown-floral-invitation/',
+  'tropical-fiesta':  'https://www.canva.com/templates/EAGHBh1t4hg-colorful-tropical-birthday-invitation/',
+  'debut-pink':       'https://www.canva.com/templates/EAGHBh1t4hg-pink-and-gold-debut-invitation/',
+  'christening-blue': 'https://www.canva.com/templates/EAGHBh1t4hg-blue-and-white-christening-invitation/',
+  'graduation-classic':'https://www.canva.com/templates/EAGNkiY0tKg-navy-and-gold-graduation-invitation/'
+};
+
+// Canva search fallback per event type (used when no exact template match)
+const CANVA_EVENT_SEARCH = {
+  wedding:     'https://www.canva.com/templates/?query=wedding+invitation+a5+free&doctype=A5Document&pricingFilter=free',
+  debut:       'https://www.canva.com/templates/?query=debut+18th+birthday+invitation+a5&doctype=A5Document&pricingFilter=free',
+  birthday:    'https://www.canva.com/templates/?query=birthday+invitation+a5&doctype=A5Document&pricingFilter=free',
+  christening: 'https://www.canva.com/templates/?query=christening+baptism+invitation+a5&doctype=A5Document&pricingFilter=free',
+  babyshower:  'https://www.canva.com/templates/?query=baby+shower+invitation+a5&doctype=A5Document&pricingFilter=free',
+  graduation:  'https://www.canva.com/templates/?query=graduation+invitation+a5&doctype=A5Document&pricingFilter=free',
+  anniversary: 'https://www.canva.com/templates/?query=anniversary+invitation+a5&doctype=A5Document&pricingFilter=free',
+  reunion:     'https://www.canva.com/templates/?query=reunion+party+invitation+a5&doctype=A5Document&pricingFilter=free',
+  corporate:   'https://www.canva.com/templates/?query=corporate+event+invitation+a5&doctype=A5Document&pricingFilter=free',
+  fiesta:      'https://www.canva.com/templates/?query=fiesta+party+invitation+a5&doctype=A5Document&pricingFilter=free',
+  kasalan:     'https://www.canva.com/templates/?query=wedding+invitation+a5+free&doctype=A5Document&pricingFilter=free',
+  other:       'https://www.canva.com/templates/?query=invitation+a5&doctype=A5Document&pricingFilter=free'
+};
+
 const TEMPLATES = [
   { id:'elegant-gold',    name:'Elegant Gold',     mood:'Classic & formal',    bg:'#f9f5ed', orn:'&#10022; &#10022; &#10022;', oc:'#b8935a',
     css:'body{font-family:\'Playfair Display\',Georgia,serif;background:#f9f5ed;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#fff;max-width:500px;width:100%;padding:60px 50px;text-align:center;border:1px solid #d4b483;position:relative;}.card::before,.card::after{content:\'\';position:absolute;border:.5px solid #d4b483;}.card::before{top:8px;left:8px;right:8px;bottom:8px;}.card::after{top:14px;left:14px;right:14px;bottom:14px;}.ey{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#b8935a;margin-bottom:16px;}.orn{font-size:24px;color:#b8935a;margin-bottom:14px;letter-spacing:6px;}h1{font-size:2.5rem;font-weight:400;color:#2a2016;line-height:1.2;margin-bottom:8px;}h1 em{font-style:italic;}.dv{width:60px;height:1px;background:#d4b483;margin:16px auto;}.det{font-size:14px;color:#6b5c40;line-height:2;margin:12px 0;}.det strong{display:block;color:#2a2016;font-size:15px;font-weight:400;}.rsvp{margin-top:22px;padding-top:16px;border-top:.5px solid #e8dcc8;font-size:11px;color:#9a8060;letter-spacing:.1em;text-transform:uppercase;}@media print{body{background:white;}}' },
@@ -289,11 +358,165 @@ const TEMPLATES = [
     css:'body{font-family:sans-serif;background:#e0d8c4;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#fff;max-width:500px;width:100%;padding:50px 44px;text-align:center;border-top:6px solid #1a2a6c;border-bottom:6px solid #1a2a6c;}.shield{font-size:40px;margin-bottom:8px;}.ey{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8a7020;margin-bottom:8px;}h1{font-size:2rem;color:#1a2a6c;line-height:1.25;margin-bottom:3px;font-style:italic;}h2{font-size:1rem;color:#6a5010;margin-bottom:12px;}.dline{height:1px;background:linear-gradient(90deg,transparent,#c8a830,transparent);margin:12px 0;}.det{font-size:13px;color:#4a4430;line-height:2.1;}.det strong{display:block;color:#1a2a6c;font-size:14px;font-weight:600;}.seal{width:52px;height:52px;border-radius:50%;background:#1a2a6c;color:#c8a830;font-size:24px;margin:10px auto;display:flex;align-items:center;justify-content:center;}.rsvp{margin-top:12px;font-size:11px;color:#8a7a40;letter-spacing:.1em;}@media print{.card{border-top:6px solid #1a2a6c;border-bottom:6px solid #1a2a6c;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}' }
 ];
 
+// ── KIDS CHARACTER THEMES ──────────────────────────────────────────
+const KIDS_THEMES = [
+  { id:'princess', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <circle cx="35" cy="22" r="13" fill="#f9d4b8"/> <path d="M16 68 C16 44 22 38 35 36 C48 38 54 44 54 68Z" fill="#e060a0"/> <path d="M22 68 L16 52 L35 60 L54 52 L48 68Z" fill="#ff80c0"/> <ellipse cx="35" cy="68" rx="19" ry="4" fill="#c040808" opacity=".2"/> <path d="M28 20 Q35 14 42 20" fill="none" stroke="#8b4513" stroke-width="2.5" stroke-linecap="round"/> <circle cx="28" cy="23" r="2" fill="#3a1a00" opacity=".8"/> <circle cx="42" cy="23" r="2" fill="#3a1a00" opacity=".8"/> <path d="M30 28 Q35 32 40 28" fill="none" stroke="#c0506a" stroke-width="1.5" stroke-linecap="round"/> <polygon points="35,4 37,10 43,10 38,14 40,20 35,16 30,20 32,14 27,10 33,10" fill="#ffd700" stroke="#c8a000" stroke-width=".5"/> <circle cx="35" cy="9" r="1.5" fill="#fff"/> <circle cx="29" cy="11" r="1" fill="#fff"/> <circle cx="41" cy="11" r="1" fill="#fff"/> </svg>`,     name:'Princess',      icon:'👸', sub:'Fairy tale & royal',
+    bg:'#fff0f6', mainColor:'#e060a0', accent:'#ffd700', textColor:'#7a1050',
+    css:`body{font-family:'Comic Sans MS',cursive,sans-serif;background:linear-gradient(135deg,#ffe0f0,#fff0ff);margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#fff;max-width:500px;width:100%;padding:50px 40px;text-align:center;border:3px solid #ffb6d9;border-radius:24px;position:relative;}
+.card::before{content:'👑';position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:36px;}
+.ey{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#e060a0;margin-bottom:10px;}
+h1{font-size:2.8rem;color:#c0306a;margin:0 0 5px;text-shadow:2px 2px 0 #ffd0e8;}
+.stars{font-size:20px;letter-spacing:4px;margin:8px 0;}.age{font-size:1.4rem;color:#e060a0;font-weight:700;margin:6px 0;}
+.dv{font-size:16px;color:#ffb6d9;letter-spacing:4px;margin:10px 0;}
+.det{font-size:14px;color:#8a3060;line-height:1.9;}.det strong{display:block;color:#c0306a;font-size:15px;}
+.rsvp{margin-top:16px;font-size:11px;color:#e060a0;background:#fff0f6;border-radius:20px;padding:8px 16px;display:inline-block;}` },
+
+  { id:'mickey', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <circle cx="20" cy="18" r="13" fill="#1a1a1a"/> <circle cx="50" cy="18" r="13" fill="#1a1a1a"/> <circle cx="35" cy="40" r="20" fill="#1a1a1a"/> <circle cx="35" cy="36" r="16" fill="#f0c090"/> <circle cx="28" cy="33" r="3.5" fill="#1a1a1a"/> <circle cx="42" cy="33" r="3.5" fill="#1a1a1a"/> <circle cx="29" cy="32" r="1.2" fill="#fff"/> <circle cx="43" cy="32" r="1.2" fill="#fff"/> <ellipse cx="35" cy="40" rx="8" ry="5" fill="#f8c0a0"/> <path d="M30 43 Q35 47 40 43" fill="none" stroke="#c05050" stroke-width="1.8" stroke-linecap="round"/> <rect x="20" y="20" width="30" height="5" rx="2.5" fill="#ff0000"/> <rect x="32" y="16" width="6" height="8" rx="1" fill="#ff0000"/> <ellipse cx="35" cy="19" rx="8" ry="2" fill="#ffff00"/> </svg>`,       name:'Mickey Mouse',  icon:'🐭', sub:'Classic Disney',
+    bg:'#ffff00', mainColor:'#ff0000', accent:'#000000', textColor:'#000',
+    css:`body{font-family:Arial,sans-serif;background:#ffcc00;margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#fff;max-width:500px;width:100%;padding:50px 40px;text-align:center;border:4px solid #ff0000;border-radius:16px;position:relative;}
+.ears{font-size:40px;letter-spacing:-8px;margin-bottom:-10px;display:block;}
+.ey{font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#ff0000;font-weight:700;margin-bottom:8px;}
+h1{font-size:2.6rem;font-weight:900;color:#000;margin:0 0 4px;letter-spacing:-1px;}
+.age{font-size:1.6rem;font-weight:900;color:#ff0000;margin:4px 0;}
+.dv{width:60px;height:3px;background:#ff0000;margin:12px auto;border-radius:2px;}
+.det{font-size:13px;color:#333;line-height:2;}.det strong{display:block;color:#000;font-size:15px;font-weight:700;}
+.rsvp{margin-top:16px;background:#ff0000;color:#fff;border-radius:8px;padding:8px 20px;display:inline-block;font-weight:700;font-size:12px;}` },
+
+  { id:'spiderman', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <circle cx="35" cy="35" r="30" fill="#cc0000"/> <path d="M5 35 Q20 20 35 35 Q50 20 65 35" fill="none" stroke="#000" stroke-width="1.5"/> <path d="M5 35 Q20 50 35 35 Q50 50 65 35" fill="none" stroke="#000" stroke-width="1.5"/> <path d="M35 5 L35 65" stroke="#000" stroke-width="1.5"/> <path d="M35 5 Q50 20 65 35" stroke="#000" stroke-width="1.5" fill="none"/> <path d="M35 5 Q20 20 5 35" stroke="#000" stroke-width="1.5" fill="none"/> <path d="M35 65 Q50 50 65 35" stroke="#000" stroke-width="1.5" fill="none"/> <path d="M35 65 Q20 50 5 35" stroke="#000" stroke-width="1.5" fill="none"/> <ellipse cx="35" cy="28" rx="18" ry="12" fill="#cc0000"/> <path d="M17 22 Q35 10 53 22" fill="#000080" stroke="none"/> <ellipse cx="26" cy="26" rx="7" ry="5" fill="#fff" opacity=".9"/> <ellipse cx="44" cy="26" rx="7" ry="5" fill="#fff" opacity=".9"/> <ellipse cx="26" cy="26" rx="5" ry="3.5" fill="#000080"/> <ellipse cx="44" cy="26" rx="5" ry="3.5" fill="#000080"/> </svg>`,    name:'Spider-Man',    icon:'🕷️', sub:'Marvel superhero',
+    bg:'#cc0000', mainColor:'#cc0000', accent:'#000080', textColor:'#fff',
+    css:`body{font-family:Arial Black,sans-serif;background:linear-gradient(160deg,#cc0000,#880000);margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#fff;max-width:500px;width:100%;padding:50px 40px;text-align:center;border:4px solid #000080;border-radius:8px;position:relative;overflow:hidden;}
+.card::before{content:'🕷️';position:absolute;top:10px;right:14px;font-size:28px;opacity:.15;}
+.card::after{content:'🕸️';position:absolute;bottom:8px;left:10px;font-size:28px;opacity:.12;}
+.web{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#cc0000;font-weight:900;margin-bottom:8px;}
+h1{font-size:2.6rem;font-weight:900;color:#cc0000;margin:0 0 4px;text-shadow:3px 3px 0 #00008044;letter-spacing:-1px;}
+.age{font-size:1.4rem;font-weight:900;color:#000080;margin:4px 0;}
+.dv{height:3px;background:linear-gradient(90deg,#cc0000,#000080);margin:12px 0;border-radius:2px;}
+.det{font-size:13px;color:#333;line-height:2;}.det strong{display:block;color:#cc0000;font-size:15px;font-weight:700;}
+.rsvp{margin-top:14px;background:#000080;color:#fff;border-radius:6px;padding:8px 18px;font-weight:700;font-size:12px;display:inline-block;}` },
+
+  { id:'frozen', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#c0e8ff"/><stop offset="100%" stop-color="#e8f8ff"/></linearGradient></defs> <circle cx="35" cy="35" r="30" fill="url(#sky)"/> <circle cx="35" cy="22" r="11" fill="#f5e8d8"/> <path d="M18 68 C18 46 25 40 35 38 C45 40 52 46 52 68Z" fill="#4ab0e0"/> <path d="M25 68 L20 54 L35 62 L50 54 L45 68Z" fill="#80d0f8"/> <path d="M28 16 Q35 11 42 16" fill="none" stroke="#d4a860" stroke-width="2.5" stroke-linecap="round"/> <circle cx="29" cy="22" r="1.8" fill="#2a1a00" opacity=".8"/> <circle cx="41" cy="22" r="1.8" fill="#2a1a00" opacity=".8"/> <path d="M31 27 Q35 30 39 27" fill="none" stroke="#c08090" stroke-width="1.5" stroke-linecap="round"/> <g fill="#c0e8ff" opacity=".8"> <path d="M35 4 L36.5 8 L35 12 L33.5 8Z"/> <path d="M35 4 L39 7 L35 12 L31 7Z" opacity=".6"/> <circle cx="35" cy="8" r="1.5" fill="#fff"/> </g> <g fill="#b0d8f8" stroke="#6ab8d8" stroke-width=".5"> <polygon points="10,30 11.5,35 10,40 8.5,35" /> <polygon points="8,34 13,33 18,34 13,35" /> <circle cx="13" cy="34.5" r="1" fill="#fff"/> </g> </svg>`,       name:'Frozen',        icon:'❄️', sub:'Elsa & Anna',
+    bg:'#e0f4ff', mainColor:'#4ab0e0', accent:'#ffffff', textColor:'#0a3a6a',
+    css:`body{font-family:Georgia,serif;background:linear-gradient(160deg,#c0e8ff,#e8f8ff);margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:rgba(255,255,255,.92);max-width:500px;width:100%;padding:50px 40px;text-align:center;border:2px solid #7ad0f0;border-radius:12px;position:relative;}
+.snow{font-size:20px;letter-spacing:5px;margin-bottom:6px;opacity:.7;}
+.ey{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#4ab0e0;margin-bottom:8px;}
+h1{font-size:2.4rem;color:#0a3a6a;margin:0 0 4px;font-style:italic;}
+.age{font-size:1.2rem;color:#4ab0e0;font-style:italic;margin:6px 0;}
+.dv{font-size:20px;color:#a0d8f0;letter-spacing:6px;margin:10px 0;}
+.det{font-size:13px;color:#2a5a8a;line-height:2;}.det strong{display:block;color:#0a3a6a;font-size:15px;}
+.rsvp{margin-top:14px;background:#4ab0e0;color:#fff;border-radius:20px;padding:8px 20px;font-size:11px;display:inline-block;letter-spacing:.06em;}` },
+
+  { id:'superheroes', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <circle cx="35" cy="22" r="12" fill="#f5c090"/> <path d="M15 68 C15 44 22 38 35 36 C48 38 55 44 55 68Z" fill="#cc0000"/> <polygon points="35,38 28,52 35,48 42,52" fill="#ffd700"/> <path d="M28 16 Q35 11 42 16" fill="none" stroke="#3a2010" stroke-width="2.5" stroke-linecap="round"/> <rect x="24" y="18" width="22" height="10" rx="5" fill="#1a1a2e" opacity=".9"/> <ellipse cx="29" cy="22" rx="5" ry="3.5" fill="#fff" opacity=".95"/> <ellipse cx="41" cy="22" rx="5" ry="3.5" fill="#fff" opacity=".95"/> <ellipse cx="29" cy="22" rx="3.5" ry="2.5" fill="#cc0000"/> <ellipse cx="41" cy="22" rx="3.5" ry="2.5" fill="#cc0000"/> <path d="M30 30 Q35 34 40 30" fill="none" stroke="#3a2010" stroke-width="1.5" stroke-linecap="round"/> <path d="M15 38 L5 50 L20 46Z" fill="#cc0000"/> <path d="M55 38 L65 50 L50 46Z" fill="#cc0000"/> </svg>`,  name:'Superheroes',   icon:'🦸', sub:'Mix of heroes',
+    bg:'#1a1a2e', mainColor:'#e94560', accent:'#ffd700', textColor:'#fff',
+    css:`body{font-family:Arial Black,sans-serif;background:linear-gradient(135deg,#1a1a2e,#16213e);margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#0f3460;max-width:500px;width:100%;padding:50px 40px;text-align:center;border:3px solid #e94560;border-radius:8px;position:relative;overflow:hidden;}
+.card::before{content:'⚡';position:absolute;top:8px;right:12px;font-size:36px;opacity:.1;}
+.ey{font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:#e94560;font-weight:900;margin-bottom:8px;}
+h1{font-size:2.4rem;font-weight:900;color:#ffd700;margin:0 0 4px;text-shadow:0 0 20px rgba(255,215,0,.4);}
+.age{font-size:1.6rem;font-weight:900;color:#e94560;margin:4px 0;}
+.dv{height:3px;background:linear-gradient(90deg,#e94560,#ffd700,#e94560);margin:14px 0;}
+.det{font-size:13px;color:#a0c0e0;line-height:2;}.det strong{display:block;color:#fff;font-size:15px;}
+.rsvp{margin-top:14px;background:#e94560;color:#fff;border-radius:6px;padding:8px 18px;font-weight:700;font-size:12px;display:inline-block;}` },
+
+  { id:'unicorn', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <ellipse cx="40" cy="42" rx="22" ry="16" fill="#fff0ff"/> <ellipse cx="40" cy="42" rx="22" ry="16" fill="none" stroke="#d8a0f8" stroke-width="1.5"/> <circle cx="24" cy="30" r="14" fill="#fff0ff" stroke="#d8a0f8" stroke-width="1.5"/> <path d="M20 18 L24 5 L28 18Z" fill="#ffd700" stroke="#c8a000" stroke-width=".8"/> <defs><linearGradient id="mane" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#ff80c0"/><stop offset="33%" stop-color="#c060e0"/><stop offset="66%" stop-color="#80a0ff"/><stop offset="100%" stop-color="#60d0c0"/></linearGradient></defs> <path d="M30 20 Q38 16 38 26 Q38 32 30 34" fill="url(#mane)" stroke="none"/> <circle cx="20" cy="31" r="2.5" fill="#1a1a1a"/> <circle cx="21" cy="30" r="1" fill="#fff"/> <ellipse cx="26" cy="36" rx="4" ry="2.5" fill="#ffb0e0"/> <ellipse cx="30" cy="54" rx="5" ry="8" fill="#fff0ff" stroke="#d8a0f8" stroke-width="1"/> <ellipse cx="45" cy="54" rx="5" ry="8" fill="#fff0ff" stroke="#d8a0f8" stroke-width="1"/> <ellipse cx="50" cy="54" rx="5" ry="8" fill="#fff0ff" stroke="#d8a0f8" stroke-width="1"/> <path d="M56 42 Q65 38 62 50 Q60 56 52 56" fill="#ff80c0" stroke="#c060a0" stroke-width="1"/> </svg>`,      name:'Unicorn',       icon:'🦄', sub:'Rainbow & magic',
+    bg:'#fff0ff', mainColor:'#c060e0', accent:'#ff80c0', textColor:'#5a1080',
+    css:`body{font-family:'Comic Sans MS',cursive,sans-serif;background:linear-gradient(135deg,#ffe0ff,#fff0e0,#e0f0ff);margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#fff;max-width:500px;width:100%;padding:50px 40px;text-align:center;border:3px solid #e0a0ff;border-radius:30px;}
+.horn{font-size:36px;margin-bottom:4px;}
+.ey{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#c060e0;margin-bottom:8px;}
+h1{font-size:2.6rem;color:#c060e0;margin:0 0 4px;font-style:italic;text-shadow:2px 2px 0 #ffc0ff;}
+.age{font-size:1.2rem;color:#ff80c0;font-weight:700;margin:6px 0;}
+.rainbow{font-size:16px;letter-spacing:2px;margin:8px 0;}
+.dv{font-size:14px;letter-spacing:5px;color:#e0a0ff;margin:10px 0;}
+.det{font-size:13px;color:#8040a0;line-height:2;}.det strong{display:block;color:#c060e0;font-size:15px;}
+.rsvp{margin-top:14px;background:linear-gradient(90deg,#ff80c0,#c060e0,#80a0ff);color:#fff;border-radius:20px;padding:8px 20px;font-size:11px;font-weight:700;display:inline-block;}` },
+
+  { id:'dinosaur', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <ellipse cx="35" cy="48" rx="20" ry="14" fill="#5ab830"/> <circle cx="28" cy="30" r="16" fill="#5ab830"/> <path d="M14 26 L10 16 L16 24 L18 12 L22 22 L26 10 L28 22" fill="#5ab830" stroke="#4a9820" stroke-width="1"/> <path d="M44 30 Q60 24 58 38 Q56 46 44 44Z" fill="#5ab830"/> <circle cx="22" cy="26" r="4" fill="#1a1a1a"/> <circle cx="23" cy="25" r="1.5" fill="#fff"/> <path d="M18 34 Q28 40 36 34" fill="none" stroke="#2a7010" stroke-width="2" stroke-linecap="round"/> <rect x="16" y="56" width="8" height="14" rx="4" fill="#4a9820"/> <rect x="28" y="58" width="8" height="12" rx="4" fill="#4a9820"/> <ellipse cx="20" cy="35" rx="3" ry="2" fill="#ff6b35" opacity=".7"/> <ellipse cx="35" cy="49" rx="6" ry="3" fill="#7ad050" opacity=".6"/> </svg>`,     name:'Dinosaur',      icon:'🦕', sub:'Dino party!',
+    bg:'#e8f5e0', mainColor:'#4a8a20', accent:'#ff6b35', textColor:'#1a4a00',
+    css:`body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#c8f0a0,#e8f8d0);margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#f0fce8;max-width:500px;width:100%;padding:50px 40px;text-align:center;border:3px solid #6ab830;border-radius:12px;}
+.dino{font-size:40px;margin-bottom:6px;}
+.ey{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#4a8a20;font-weight:700;margin-bottom:8px;}
+h1{font-size:2.5rem;font-weight:900;color:#1a4a00;margin:0 0 4px;}
+.age{font-size:1.4rem;font-weight:700;color:#ff6b35;margin:4px 0;}
+.dv{font-size:18px;color:#6ab830;letter-spacing:3px;margin:10px 0;}
+.det{font-size:13px;color:#3a6010;line-height:2;}.det strong{display:block;color:#1a4a00;font-size:15px;font-weight:700;}
+.rsvp{margin-top:14px;background:#4a8a20;color:#fff;border-radius:8px;padding:8px 20px;font-weight:700;font-size:12px;display:inline-block;}` },
+
+  { id:'hellokitty', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <ellipse cx="35" cy="36" rx="22" ry="24" fill="#fff"/> <ellipse cx="35" cy="36" rx="22" ry="24" fill="none" stroke="#ff99cc" stroke-width="1.5"/> <ellipse cx="22" cy="16" rx="8" ry="9" fill="#fff" stroke="#ff99cc" stroke-width="1.5"/> <ellipse cx="48" cy="16" rx="8" ry="9" fill="#fff" stroke="#ff99cc" stroke-width="1.5"/> <circle cx="26" cy="32" r="3.5" fill="#1a1a1a"/> <circle cx="44" cy="32" r="3.5" fill="#1a1a1a"/> <circle cx="27" cy="31" r="1.2" fill="#fff"/> <circle cx="45" cy="31" r="1.2" fill="#fff"/> <ellipse cx="35" cy="40" rx="5" ry="3.5" fill="#ffaacc"/> <line x1="18" y1="38" x2="32" y2="40" stroke="#1a1a1a" stroke-width="1.2"/> <line x1="18" y1="41" x2="32" y2="41" stroke="#1a1a1a" stroke-width="1.2"/> <line x1="18" y1="44" x2="32" y2="42" stroke="#1a1a1a" stroke-width="1.2"/> <line x1="52" y1="38" x2="38" y2="40" stroke="#1a1a1a" stroke-width="1.2"/> <line x1="52" y1="41" x2="38" y2="41" stroke="#1a1a1a" stroke-width="1.2"/> <line x1="52" y1="44" x2="38" y2="42" stroke="#1a1a1a" stroke-width="1.2"/> <rect x="38" y="25" width="12" height="9" rx="4.5" fill="#ff0066"/> <circle cx="44" cy="29.5" r="2.5" fill="#fff"/> </svg>`,   name:'Hello Kitty',   icon:'🎀', sub:'Sanrio classic',
+    bg:'#ffe0f0', mainColor:'#ff6699', accent:'#ff0066', textColor:'#880044',
+    css:`body{font-family:'Comic Sans MS',cursive,sans-serif;background:linear-gradient(135deg,#ffd0e8,#ffe8f0);margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#fff;max-width:500px;width:100%;padding:50px 40px;text-align:center;border:3px solid #ff99cc;border-radius:20px;position:relative;}
+.card::before,.card::after{content:'🎀';position:absolute;font-size:22px;}
+.card::before{top:12px;left:14px;}.card::after{top:12px;right:14px;}
+.kitty{font-size:36px;margin-bottom:4px;}
+.ey{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#ff6699;margin-bottom:8px;}
+h1{font-size:2.4rem;color:#ff0066;margin:0 0 4px;text-shadow:2px 2px 0 #ffc0d8;}
+.age{font-size:1.2rem;color:#ff6699;font-weight:700;margin:6px 0;}
+.dv{font-size:14px;color:#ffb3d1;letter-spacing:5px;margin:10px 0;}
+.det{font-size:13px;color:#880044;line-height:2;}.det strong{display:block;color:#ff0066;font-size:15px;}
+.rsvp{margin-top:14px;background:#ff6699;color:#fff;border-radius:20px;padding:8px 20px;font-size:11px;font-weight:700;display:inline-block;}` },
+
+  { id:'blippi', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <circle cx="35" cy="24" r="14" fill="#f9d4a0"/> <rect x="13" y="36" width="44" height="28" rx="6" fill="#ff8c00"/> <rect x="22" y="36" width="26" height="12" rx="3" fill="#fff"/> <rect x="29" y="36" width="12" height="28" rx="3" fill="#0066cc"/> <path d="M28 16 Q35 10 42 16" fill="none" stroke="#8b4513" stroke-width="2.5" stroke-linecap="round"/> <circle cx="28" cy="22" r="2.5" fill="#1a1a1a"/> <circle cx="42" cy="22" r="2.5" fill="#1a1a1a"/> <circle cx="29" cy="21" r="1" fill="#fff"/> <circle cx="43" cy="21" r="1" fill="#fff"/> <path d="M30 28 Q35 32 40 28" fill="none" stroke="#c05050" stroke-width="1.5" stroke-linecap="round"/> <rect x="16" y="10" width="38" height="12" rx="6" fill="#ff8c00"/> <rect x="16" y="10" width="38" height="6" rx="3" fill="#0066cc"/> <ellipse cx="35" cy="10" rx="8" ry="4" fill="#ff8c00"/> <rect x="30" y="6" width="10" height="4" rx="2" fill="#0066cc"/> </svg>`,       name:'Blippi',        icon:'🧡', sub:'Blue & orange fun',
+    bg:'#fff8e0', mainColor:'#ff8c00', accent:'#0066cc', textColor:'#1a2a6c',
+    css:`body{font-family:Arial Rounded MT Bold,Arial,sans-serif;background:linear-gradient(135deg,#ffe0a0,#fff8d0);margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#fff;max-width:500px;width:100%;padding:50px 40px;text-align:center;border:4px solid #ff8c00;border-radius:16px;}
+.top-bar{height:10px;background:linear-gradient(90deg,#ff8c00,#0066cc,#ff8c00);margin:-50px -40px 20px;border-radius:12px 12px 0 0;}
+.ey{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#0066cc;font-weight:700;margin-bottom:8px;}
+h1{font-size:2.6rem;font-weight:900;color:#ff8c00;margin:0 0 4px;}
+.age{font-size:1.4rem;font-weight:900;color:#0066cc;margin:4px 0;}
+.dv{height:4px;background:linear-gradient(90deg,#ff8c00,#0066cc);margin:12px auto;width:80px;border-radius:2px;}
+.det{font-size:13px;color:#1a2a6c;line-height:2;}.det strong{display:block;color:#ff8c00;font-size:15px;font-weight:700;}
+.rsvp{margin-top:14px;background:#0066cc;color:#fff;border-radius:8px;padding:8px 20px;font-weight:700;font-size:12px;display:inline-block;}` },
+
+  { id:'paw', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <circle cx="35" cy="26" r="18" fill="#e8d0a8"/> <ellipse cx="20" cy="16" rx="7" ry="8" fill="#e8d0a8"/> <ellipse cx="50" cy="16" rx="7" ry="8" fill="#e8d0a8"/> <circle cx="27" cy="23" r="3" fill="#1a1a1a"/> <circle cx="43" cy="23" r="3" fill="#1a1a1a"/> <circle cx="28" cy="22" r="1" fill="#fff"/> <circle cx="44" cy="22" r="1" fill="#fff"/> <ellipse cx="35" cy="30" rx="6" ry="4" fill="#d0a880"/> <path d="M29 33 Q35 38 41 33" fill="none" stroke="#8b4513" stroke-width="1.8" stroke-linecap="round"/> <path d="M14 44 Q14 68 35 64 Q56 68 56 44 Q56 36 35 38 Q14 36 14 44Z" fill="#e84030"/> <path d="M28 44 L32 52 L35 44 L38 52 L42 44" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/> <ellipse cx="35" cy="55" rx="10" ry="6" fill="#c83020"/> <circle cx="27" cy="50" r="3" fill="#2060c0"/> <circle cx="43" cy="50" r="3" fill="#ffd700"/> </svg>`,          name:'PAW Patrol',    icon:'🐾', sub:'Chase & Marshall',
+    bg:'#e8f0ff', mainColor:'#e84030', accent:'#2060c0', textColor:'#0a2060',
+    css:`body{font-family:Arial Black,sans-serif;background:linear-gradient(135deg,#c8d8ff,#dce8ff);margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#fff;max-width:500px;width:100%;padding:50px 40px;text-align:center;border:4px solid #e84030;border-radius:16px;position:relative;}
+.paw-row{font-size:22px;letter-spacing:2px;margin-bottom:8px;}
+.ey{font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#e84030;font-weight:900;margin-bottom:8px;}
+h1{font-size:2.4rem;font-weight:900;color:#0a2060;margin:0 0 4px;}
+.age{font-size:1.4rem;font-weight:900;color:#e84030;margin:4px 0;}
+.badge{display:inline-block;background:#e84030;color:#fff;font-size:9px;font-weight:900;padding:3px 10px;border-radius:4px;letter-spacing:.1em;text-transform:uppercase;margin:8px 0;}
+.dv{height:3px;background:linear-gradient(90deg,#e84030,#2060c0);margin:12px 0;border-radius:2px;}
+.det{font-size:13px;color:#0a2060;line-height:2;}.det strong{display:block;color:#e84030;font-size:15px;font-weight:700;}
+.rsvp{margin-top:14px;background:#2060c0;color:#fff;border-radius:8px;padding:8px 18px;font-weight:700;font-size:12px;display:inline-block;}` },
+
+  { id:'peppa', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <ellipse cx="35" cy="34" rx="22" ry="20" fill="#ff9dbb"/> <ellipse cx="35" cy="28" rx="18" ry="16" fill="#ff9dbb"/> <ellipse cx="30" cy="22" rx="9" ry="7" fill="#ff9dbb"/> <ellipse cx="40" cy="22" rx="9" ry="7" fill="#ff9dbb"/> <ellipse cx="35" cy="34" rx="12" ry="8" fill="#ffb8cc"/> <ellipse cx="32" cy="33" rx="3" ry="2.5" fill="#c0004a"/> <ellipse cx="38" cy="33" rx="3" ry="2.5" fill="#c0004a"/> <circle cx="27" cy="26" r="4" fill="#1a1a1a"/> <circle cx="43" cy="26" r="4" fill="#1a1a1a"/> <circle cx="28" cy="25" r="1.5" fill="#fff"/> <circle cx="44" cy="25" r="1.5" fill="#fff"/> <path d="M28 38 Q35 44 42 38" fill="none" stroke="#c0004a" stroke-width="2" stroke-linecap="round"/> <rect x="18" y="50" width="34" height="18" rx="8" fill="#e84060"/> <rect x="14" y="52" width="8" height="14" rx="4" fill="#ff9dbb"/> <rect x="48" y="52" width="8" height="14" rx="4" fill="#ff9dbb"/> </svg>`,        name:'Peppa Pig',     icon:'🐷', sub:'Oink oink party!',
+    bg:'#ffe8f0', mainColor:'#ff6b9d', accent:'#ff9900', textColor:'#c0004a',
+    css:`body{font-family:'Comic Sans MS',cursive,sans-serif;background:linear-gradient(135deg,#ffc8e0,#ffe8f0);margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#fff;max-width:500px;width:100%;padding:50px 40px;text-align:center;border:3px solid #ff9dd4;border-radius:16px;}
+.piggy{font-size:40px;margin-bottom:6px;}
+.ey{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#ff6b9d;font-weight:700;margin-bottom:8px;}
+h1{font-size:2.4rem;color:#c0004a;margin:0 0 4px;}
+.age{font-size:1.2rem;color:#ff6b9d;font-weight:700;margin:6px 0;}
+.muddy{font-size:16px;letter-spacing:3px;margin:8px 0;}
+.dv{font-size:14px;color:#ffc0d8;letter-spacing:4px;margin:10px 0;}
+.det{font-size:13px;color:#8a0036;line-height:2;}.det strong{display:block;color:#c0004a;font-size:15px;}
+.rsvp{margin-top:14px;background:#ff6b9d;color:#fff;border-radius:20px;padding:8px 20px;font-size:11px;font-weight:700;display:inline-block;}` },
+
+  { id:'minecraft', svg:`<svg width="70" height="70" viewBox="0 0 70 70" xmlns="http://www.w3.org/2000/svg"> <rect x="15" y="8" width="40" height="40" fill="#5a8a3a"/> <rect x="15" y="8" width="40" height="10" fill="#7ab850"/> <rect x="15" y="8" width="40" height="2" fill="#9ad870"/> <rect x="18" y="20" width="10" height="10" fill="#1a3a1a"/> <rect x="42" y="20" width="10" height="10" fill="#1a3a1a"/> <rect x="20" y="21" width="8" height="8" fill="#4a7a28" opacity=".6"/> <rect x="44" y="21" width="8" height="8" fill="#4a7a28" opacity=".6"/> <rect x="22" y="22" width="4" height="4" fill="#a0c870" opacity=".8"/> <rect x="46" y="22" width="4" height="4" fill="#a0c870" opacity=".8"/> <rect x="28" y="34" width="14" height="6" fill="#7ab850"/> <rect x="29" y="35" width="5" height="4" fill="#4a6a28" opacity=".5"/> <rect x="36" y="35" width="5" height="4" fill="#4a6a28" opacity=".5"/> <rect x="22" y="48" width="12" height="20" fill="#5a6a38"/> <rect x="36" y="48" width="12" height="20" fill="#5a6a38"/> <rect x="22" y="48" width="12" height="8" fill="#3a4a28"/> <rect x="36" y="48" width="12" height="8" fill="#3a4a28"/> <rect x="8" y="18" width="8" height="30" fill="#4a6a28"/> <rect x="54" y="18" width="8" height="30" fill="#4a6a28"/> <rect x="4" y="28" width="8" height="10" fill="#6a8a40"/> <rect x="58" y="28" width="8" height="10" fill="#6a8a40"/>`,    name:'Minecraft',     icon:'⛏️', sub:'Pixel adventure',
+    bg:'#5a8a3a', mainColor:'#4a7a28', accent:'#7aaf4e', textColor:'#fff',
+    css:`body{font-family:monospace;background:#2a4a1a;margin:0;padding:20px;display:flex;align-items:center;justify-content:center;min-height:100vh;}
+.card{background:#3a5a28;max-width:500px;width:100%;padding:50px 40px;text-align:center;border:4px solid #7aaf4e;image-rendering:pixelated;}
+.pixel{font-size:24px;letter-spacing:4px;margin-bottom:8px;}
+.ey{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#a0c870;font-weight:700;margin-bottom:10px;}
+h1{font-size:2.2rem;font-weight:700;color:#fff;margin:0 0 6px;text-shadow:4px 4px 0 #1a3a08;letter-spacing:2px;}
+.age{font-size:1.4rem;font-weight:700;color:#ffd700;margin:4px 0;text-shadow:2px 2px 0 #7a5000;}
+.dv{height:4px;background:#7aaf4e;margin:12px 0;}
+.det{font-size:12px;color:#c0e0a0;line-height:2.2;}.det strong{display:block;color:#fff;font-size:13px;font-weight:700;}
+.rsvp{margin-top:14px;background:#7aaf4e;color:#fff;padding:8px 20px;font-weight:700;font-size:12px;display:inline-block;border:2px solid #4a7a28;}` },
+];
+
 // ── EVENT FORMS ───────────────────────────────────────────────────
 const EF = {
   wedding:{title:'&#128141; Wedding details',body:`<div class="frow"><div class="fg"><label>Groom's full name <span class="req">*</span></label><input id="e-groom" placeholder="Juan dela Cruz"/></div><div class="fg"><label>Bride's full name <span class="req">*</span></label><input id="e-bride" placeholder="Maria Santos"/></div></div><div class="fg"><label>Parents of the groom</label><input id="e-pgroom" placeholder="Mr. & Mrs. Pedro dela Cruz"/></div><div class="fg"><label>Parents of the bride</label><input id="e-pbride" placeholder="Mr. & Mrs. Jose Santos"/></div><div class="fg"><label>Principal sponsors (ninong/ninang) — optional</label><textarea id="e-sponsors" rows="3" placeholder="List names, one per line&#10;e.g. Atty. & Mrs. Reyes"></textarea></div><div class="frow"><div class="fg"><label>Wedding date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time of ceremony</label><input id="e-time" placeholder="e.g. 3:00 PM"/></div></div><div class="fg"><label>Church / Ceremony venue <span class="req">*</span></label><input id="e-church" placeholder="Sto. Nino Parish Church, Makati City"/></div><div class="fg"><label>Reception venue <span class="req">*</span></label><input id="e-reception" placeholder="Grand Ballroom, Raffles Hotel, Makati City"/></div><div class="frow"><div class="fg"><label>Reception time</label><input id="e-rtime" placeholder="e.g. 6:00 PM"/></div><div class="fg"><label>Dress code</label><input id="e-dress" placeholder="e.g. Formal attire"/></div></div><div class="fg"><label>RSVP / Contact</label><input id="e-rsvp" placeholder="e.g. Call Maria at 09XX XXX XXXX"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. Together with their families, you are warmly invited..."></textarea></div>`},
   debut:{title:'&#127801; Debut details',body:`<div class="frow"><div class="fg"><label>Debutante's full name <span class="req">*</span></label><input id="e-name" placeholder="Isabella Marie Santos"/></div><div class="fg"><label>Nickname</label><input id="e-nick" placeholder="Belle"/></div></div><div class="fg"><label>Parents / Hosted by</label><input id="e-parents" placeholder="Mr. & Mrs. Jose Santos"/></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 6:00 PM"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input id="e-venue" placeholder="Grand Ballroom, Hotel Name, City"/></div><div class="fg"><label>Theme / concept</label><input id="e-theme" placeholder="e.g. Enchanted Garden, Fairy Tale Princess"/></div><div class="frow"><div class="fg"><label>Attire / Dress code</label><input id="e-dress" placeholder="e.g. Formal, Cocktail"/></div><div class="fg"><label>RSVP deadline</label><input type="date" id="e-rsvpdate"/></div></div><div class="fg"><label>18 roses / 18 candles list (optional)</label><textarea id="e-18" rows="3" placeholder="List names if you want them on the invitation"></textarea></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Contact number or name"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. She's finally 18! Join us..."></textarea></div>`},
   birthday:{title:'&#127874; Birthday details',body:`<div class="frow"><div class="fg"><label>Name of celebrant <span class="req">*</span></label><input id="e-name" placeholder="Full name"/></div><div class="fg"><label>Age turning</label><input id="e-age" placeholder="e.g. 7, 21, 50, 60"/></div></div><div class="fg"><label>Hosted by (optional)</label><input id="e-host" placeholder="e.g. The Santos Family"/></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 3:00 PM"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input id="e-venue" placeholder="Venue name and full address"/></div><div class="frow"><div class="fg"><label>Theme (optional)</label><input id="e-theme" placeholder="e.g. Unicorn, Superhero, Garden Party"/></div><div class="fg"><label>Attire (optional)</label><input id="e-dress" placeholder="e.g. Casual, Colorful"/></div></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Name and contact number"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. Come join us!"></textarea></div>`},
+  kidsbday:{title:'&#127881; Kids Birthday Party',body:`<div style="background:linear-gradient(135deg,#fff8e0,#fff0f8);border:1.5px solid #ffd0e8;border-radius:10px;padding:.9rem;margin-bottom:1rem;font-size:12px;color:var(--ink2);">&#127881; You selected a <strong>Kids Character Theme</strong> &mdash; invitation will be in your chosen character style!</div><div class="frow"><div class="fg"><label>Birthday kid's name <span class="req">*</span></label><input id="e-name" placeholder="e.g. Sofia, Miguel, Emma"/></div><div class="fg"><label>Age turning <span class="req">*</span></label><input id="e-age" placeholder="e.g. 1, 3, 5, 7, 10"/></div></div><div class="fg"><label>Hosted by</label><input id="e-host" placeholder="e.g. Mom &amp; Dad, The Santos Family"/></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 2:00 PM"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input id="e-venue" placeholder="e.g. Jollibee Katipunan, Our Home, XYZ Party Place"/></div><div class="fg"><label>Dress code / Costume (optional)</label><input id="e-dress" placeholder="e.g. Come in your favorite hero costume!"/></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Parent name and mobile number"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. Games, prizes, and cake await!"></textarea></div>`},
   christening:{title:'&#10013; Christening / Baptism details',body:`<div class="frow"><div class="fg"><label>Baby's full name <span class="req">*</span></label><input id="e-baby" placeholder="Full baptismal name"/></div><div class="fg"><label>Baby's nickname</label><input id="e-nick" placeholder="e.g. Coco, Bea"/></div></div><div class="fg"><label>Parents' names <span class="req">*</span></label><input id="e-parents" placeholder="Mr. & Mrs. Juan dela Cruz"/></div><div class="fg"><label>Godparents (ninong/ninang) — optional</label><textarea id="e-ninong" rows="3" placeholder="List names, one per line"></textarea></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 10:00 AM"/></div></div><div class="fg"><label>Church / Venue <span class="req">*</span></label><input id="e-church" placeholder="Parish church name and address"/></div><div class="fg"><label>Reception venue</label><input id="e-reception" placeholder="Home address or venue"/></div><div class="fg"><label>Reception time</label><input id="e-rtime" placeholder="e.g. 12:00 PM (after the ceremony)"/></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Contact number"/></div><div class="fg"><label>Bible verse / message (optional)</label><textarea id="e-msg" rows="2" placeholder='e.g. "I can do all things through Christ..." Phil 4:13'></textarea></div>`},
   babyshower:{title:'&#128118; Baby Shower details',body:`<div class="frow"><div class="fg"><label>Mom-to-be's name <span class="req">*</span></label><input id="e-mom" placeholder="Full name or nickname"/></div><div class="fg"><label>Type</label><select id="e-type"><option>Baby Shower</option><option>Gender Reveal</option><option>Baby Shower & Gender Reveal</option></select></div></div><div class="fg"><label>Hosted by</label><input id="e-host" placeholder="e.g. The Santos Family / Barkada"/></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 2:00 PM"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input id="e-venue" placeholder="Venue name and full address"/></div><div class="frow"><div class="fg"><label>Theme (optional)</label><input id="e-theme" placeholder="e.g. Woodland, Under the Sea"/></div><div class="fg"><label>Attire (optional)</label><input id="e-dress" placeholder="e.g. Pastel colors"/></div></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Contact number"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. A little one is on the way!"></textarea></div>`},
   graduation:{title:'&#127891; Graduation details',body:`<div class="frow"><div class="fg"><label>Graduate's full name <span class="req">*</span></label><input id="e-name" placeholder="Full name as on diploma"/></div><div class="fg"><label>Degree / Course <span class="req">*</span></label><input id="e-degree" placeholder="e.g. BS Computer Science"/></div></div><div class="fg"><label>School / University <span class="req">*</span></label><input id="e-school" placeholder="e.g. University of the Philippines Diliman"/></div><div class="fg"><label>Hosted by (optional)</label><input id="e-host" placeholder="e.g. The dela Cruz Family"/></div><div class="frow"><div class="fg"><label>Ceremony date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 9:00 AM"/></div></div><div class="fg"><label>Graduation venue</label><input id="e-venue" placeholder="School venue / auditorium"/></div><div class="fg"><label>Celebration party (if any)</label><input id="e-party" placeholder="e.g. Same day, 6:00 PM at ___ restaurant"/></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Contact number"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. Ang tagal nating hinintay!"></textarea></div>`},
@@ -307,18 +530,48 @@ const EF = {
 
 // ── RENDER ────────────────────────────────────────────────────────
 function renderTemplates() {
-  document.getElementById('tpl-grid').innerHTML = TEMPLATES.map(t => {
-    const dark = ['#1a1a1a','#0d1b3e','#000'].includes(t.bg);
-    return `<div class="tc" id="tc-${t.id}" onclick="pickTemplate('${t.id}')">
-      <div class="tc-check">&#10003;</div>
-      <div class="tc-swatch" style="background:${t.bg};color:${t.oc};">${t.orn}</div>
-      <div class="tc-info"><div class="tc-name">${t.name}</div><div class="tc-mood">${t.mood}</div></div>
-    </div>`;
-  }).join('');
+  const isKids = state.event === 'kidsbday';
+
+  if(isKids) {
+    // Show character theme picker
+    const cats = [
+      { label:'Disney & Classics', themes:['princess','mickey','frozen','hellokitty'] },
+      { label:'Superheroes', themes:['spiderman','superheroes'] },
+      { label:'Trending Kids Shows', themes:['blippi','paw','peppa'] },
+      { label:'Adventure & Fun', themes:['unicorn','dinosaur','minecraft'] },
+    ];
+    let gridHTML = '<div style="font-size:13px;color:var(--ink3);margin-bottom:1rem;">Pick the character theme for the birthday kiddo! 🎉</div>';
+    cats.forEach(cat => {
+      const themeItems = KIDS_THEMES.filter(t => cat.themes.includes(t.id));
+      gridHTML += `<div class="theme-section-title">${cat.label}</div>
+      <div class="theme-grid">
+        ${themeItems.map(t => `<div class="thc" id="tc-${t.id}" onclick="pickTemplate('${t.id}')">
+          <div class="thc-icon">${t.svg||t.icon}</div>
+          <div class="thc-name">${t.name}</div>
+          <div class="thc-sub">${t.sub}</div>
+        </div>`).join('')}
+      </div>`;
+    });
+    document.getElementById('tpl-grid').innerHTML = gridHTML;
+  } else {
+    // Regular templates
+    document.getElementById('tpl-grid').innerHTML = TEMPLATES.map(t => {
+      return `<div class="tc" id="tc-${t.id}" onclick="pickTemplate('${t.id}')">
+        <div class="tc-check">&#10003;</div>
+        <div class="tc-swatch" style="background:${t.bg};color:${t.oc};">${t.orn}</div>
+        <div class="tc-info">
+          <div class="tc-name">${t.name}</div>
+          <div class="tc-mood">${t.mood}</div>
+          <div style="font-size:9px;color:#00a8b0;margin-top:4px;font-weight:600;letter-spacing:.04em;">&#127912; Opens in Canva</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
 }
 
 function pickEvent(id, el) {
   state.event = id;
+  state.template = null;
   document.querySelectorAll('.ec').forEach(c=>c.classList.remove('sel'));
   el.classList.add('sel');
   document.getElementById('s1next').disabled = false;
@@ -326,22 +579,23 @@ function pickEvent(id, el) {
 
 function pickTemplate(id) {
   state.template = id;
-  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.tc,.thc').forEach(c=>c.classList.remove('sel'));
   document.getElementById('tc-'+id).classList.add('sel');
   document.getElementById('s2next').disabled = false;
 }
 
 function goStep(n) {
-  if (n===3) loadForm();
-  [1,2,3,4,5,6].forEach(i=>{
+  if(n===2) renderTemplates();
+  if(n===3) loadForm();
+  [1,2,3,4,5].forEach(i=>{
     const el=document.getElementById('s'+i);
     if(el) el.classList.toggle('hidden',i!==n);
   });
-  [1,2,3,4,5].forEach(i=>{
+  [1,2,3,4].forEach(i=>{
     const ps=document.getElementById('ps'+i);
     if(ps){ps.classList.toggle('active',i===n);ps.classList.toggle('done',i<n);}
   });
-  document.getElementById('progress').classList.toggle('hidden',n===6);
+  document.getElementById('progress').classList.toggle('hidden',n===5);
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
@@ -375,6 +629,40 @@ function validateStep3(){
   return ok;
 }
 
+// ── PHOTO HANDLING ────────────────────────────────────────────────
+let photoDataUrl = '';
+
+function handlePhotoUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  if (file.size > 2.5 * 1024 * 1024) {
+    alert('Photo is too large. Please use an image under 2MB.');
+    return;
+  }
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    photoDataUrl = ev.target.result;
+    const prev = document.getElementById('photo-preview');
+    const box = document.getElementById('photo-box');
+    prev.src = photoDataUrl;
+    prev.classList.add('show');
+    box.classList.add('has-photo');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removePhoto(e) {
+  e.stopPropagation();
+  photoDataUrl = '';
+  const prev = document.getElementById('photo-preview');
+  const box = document.getElementById('photo-box');
+  const inp = document.getElementById('o-photo-input');
+  prev.src = '';
+  prev.classList.remove('show');
+  box.classList.remove('has-photo');
+  inp.value = '';
+}
+
 function collectAll(){
   const v={};
   document.querySelectorAll('#s3 input,#s3 textarea,#s3 select').forEach(el=>{
@@ -392,7 +680,7 @@ function goReview(){
 
 function buildReviewCard(){
   const v=collectAll();
-  const eventNames={wedding:'Wedding',debut:'Debut / Sweet 18',birthday:'Birthday',christening:'Christening',babyshower:'Baby Shower',graduation:'Graduation',anniversary:'Anniversary',reunion:'Reunion',corporate:'Corporate Event',fiesta:'Fiesta / Party',kasalan:'Kasalan sa Simbahan',other:'Custom Event'};
+  const eventNames={wedding:'Wedding',debut:'Debut / Sweet 18',birthday:'Birthday',kidsbday:'Kids Birthday',christening:'Christening',babyshower:'Baby Shower',graduation:'Graduation',anniversary:'Anniversary',reunion:'Reunion',corporate:'Corporate Event',fiesta:'Fiesta / Party',kasalan:'Kasalan sa Simbahan',other:'Custom Event'};
   const tpl=TEMPLATES.find(x=>x.id===state.template);
   const lbls={'c-name':'Full name','c-phone':'Mobile','c-email':'Email','c-city':'City',
     'e-groom':'Groom','e-bride':'Bride','e-pgroom':"Groom's parents",'e-pbride':"Bride's parents",
@@ -451,7 +739,7 @@ async function goGenerate(){
   animateGenSteps();
   const v=collectAll();
   const t=TEMPLATES.find(x=>x.id===state.template);
-  const eventNames={wedding:'Wedding',debut:'Debut / Sweet 18',birthday:'Birthday',christening:'Christening / Baptism',babyshower:'Baby Shower',graduation:'Graduation',anniversary:'Anniversary',reunion:'Reunion',corporate:'Corporate Event',fiesta:'Fiesta / Party',kasalan:'Kasalan sa Simbahan',other:'Custom Event'};
+  const eventNames={wedding:'Wedding',debut:'Debut / Sweet 18',birthday:'Birthday',kidsbday:'Kids Birthday',christening:'Christening / Baptism',babyshower:'Baby Shower',graduation:'Graduation',anniversary:'Anniversary',reunion:'Reunion',corporate:'Corporate Event',fiesta:'Fiesta / Party',kasalan:'Kasalan sa Simbahan',other:'Custom Event'};
 
   const details=Object.entries(v).filter(([k])=>!k.startsWith('o-')&&!k.startsWith('c-'))
     .map(([k,val])=>k+': '+val).join('\n');
@@ -573,27 +861,363 @@ function printPreview(){
 // ── SUBMIT ───────────────────────────────────────────────────────
 function submitOrder(){
   const v=collectAll();
-  const eventNames={wedding:'Wedding',debut:'Debut / Sweet 18',birthday:'Birthday',christening:'Christening',babyshower:'Baby Shower',graduation:'Graduation',anniversary:'Anniversary',reunion:'Reunion',corporate:'Corporate Event',fiesta:'Fiesta / Party',kasalan:'Kasalan sa Simbahan',other:'Custom Event'};
+  const eventNames={wedding:'Wedding',debut:'Debut / Sweet 18',birthday:'Birthday',kidsbday:'Kids Birthday',christening:'Christening',babyshower:'Baby Shower',graduation:'Graduation',anniversary:'Anniversary',reunion:'Reunion',corporate:'Corporate Event',fiesta:'Fiesta / Party',kasalan:'Kasalan sa Simbahan',other:'Custom Event'};
   const t=TEMPLATES.find(x=>x.id===state.template);
   const ref='IF-'+Date.now().toString().slice(-6);
   document.getElementById('ref-num').textContent=ref;
 
+  // Auto-generate the invitation HTML using the template + customer details
+  const invHTML = buildInvitationHTML(t, v, state.event, eventNames[state.event]||state.event, photoDataUrl);
+
   const orders=JSON.parse(localStorage.getItem('if_orders')||'[]');
   orders.unshift({
-    ref,ts:new Date().toISOString(),
-    event:state.event,eventLabel:eventNames[state.event]||state.event,
-    template:state.template,templateLabel:t?t.name:state.template,
+    ref, ts:new Date().toISOString(),
+    event:state.event, eventLabel:eventNames[state.event]||state.event,
+    template:state.template, templateLabel:t?t.name:state.template,
     contact:{name:v['c-name'],phone:v['c-phone'],email:v['c-email'],city:v['c-city']||''},
     order:{qty:v['o-qty']||'50',size:v['o-size']||'A5',color:v['o-color']||'',delivery:v['o-delivery']||'Pick up',notes:v['o-notes']||''},
     eventDetails:v,
-    generatedHTML:state.generatedHTML,
+    generatedHTML:invHTML,
+    photoUrl:photoDataUrl,
     status:'New'
   });
   localStorage.setItem('if_orders',JSON.stringify(orders));
   goStep(5);
 }
 
+// ── BUILD INVITATION HTML ─────────────────────────────────────────
+function buildInvitationHTML(t, v, eventId, eventLabel, photoUrl) {
+  if(!t) return '';
+
+  // Helper: get value safely
+  const g = (key) => v[key] || '';
+
+  // Format date nicely
+  function fmtDate(d) {
+    if(!d) return '';
+    try {
+      return new Date(d).toLocaleDateString('en-PH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+    } catch(e){ return d; }
+  }
+
+  // Build the invitation body based on event type
+  let body = '';
+
+  if(eventId==='wedding'||eventId==='kasalan') {
+    const isTagalog = eventId==='kasalan';
+    const pre = isTagalog ? 'Kasama ng kanilang mga pamilya' : 'Together with their families';
+    const invite = isTagalog ? 'inaanyayahan kayo sa kasalan nina' : 'joyfully invite you to the wedding of';
+    const groom = g('e-groom')||'Juan Carlo';
+    const bride = g('e-bride')||'Maria Isabella';
+    const pgroom = g('e-pgroom');
+    const pbride = g('e-pbride');
+    const date = fmtDate(g('e-date'));
+    const time = g('e-time');
+    const church = g('e-church');
+    const reception = g('e-reception');
+    const rtime = g('e-rtime');
+    const dress = g('e-dress');
+    const rsvp = g('e-rsvp');
+    const msg = g('e-msg');
+    const sponsors = g('e-sponsors');
+
+    body = `
+      <div class="ey">${pre}</div>
+      ${pgroom?`<div class="by">${pgroom}</div>`:''}
+      ${pbride||pgroom?`<div class="amp-small">and</div>`:''}
+      ${pbride?`<div class="by">${pbride}</div>`:''}
+      <div class="ey" style="margin-top:10px;">${invite}</div>
+      <div class="dv" style="margin:10px 0;"></div>
+      <h1><em>${groom}</em></h1>
+      <div class="amp">&amp;</div>
+      <h1><em>${bride}</em></h1>
+      ${photoBlock}
+      <div class="dv"></div>
+      ${date?`<div class="det"><strong>${date}</strong></div>`:''}
+      ${time?`<div class="det">${time}</div>`:''}
+      ${church?`<div class="det" style="margin-top:8px;"><strong>${church}</strong></div>`:''}
+      ${reception?`<div class="recbox"><strong>Reception to follow</strong><br/>${reception}${rtime?' &middot; '+rtime:''}</div>`:''}
+      ${dress?`<div class="det" style="font-style:italic;">${dress}</div>`:''}
+      ${sponsors?`<div class="sponsors"><div class="sponsors-title">Principal Sponsors</div>${sponsors.replace(/\n/g,'<br/>')}</div>`:''}
+      ${msg?`<div class="msg">${msg}</div>`:''}
+      ${rsvp?`<div class="rsvp">RSVP &nbsp;&middot;&nbsp; ${rsvp}</div>`:''}`;
+  }
+  else if(eventId==='debut') {
+    const name = g('e-name')||'Isabella Marie';
+    const nick = g('e-nick');
+    const parents = g('e-parents');
+    const date = fmtDate(g('e-date'));
+    const time = g('e-time');
+    const venue = g('e-venue');
+    const theme = g('e-theme');
+    const dress = g('e-dress');
+    const rsvp = g('e-rsvp');
+    const rsvpdate = g('e-rsvpdate');
+    const msg = g('e-msg');
+    const list18 = g('e-18');
+
+    body = `
+      ${parents?`<div class="ey">${parents}</div><div class="by" style="font-style:italic;">proudly presents</div>`:''}
+      <div class="ey" style="margin-top:8px;">You are cordially invited to the debut celebration of</div>
+      <div class="dv"></div>
+      <h1>${name}</h1>
+      ${nick?`<div class="det" style="font-style:italic;">&#8220;${nick}&#8221;</div>`:''}
+      <div class="ey" style="margin:8px 0;">on her most cherished</div>
+      <div class="big-num">18</div>
+      <div class="ey">th birthday</div>
+      <div class="dv"></div>
+      ${date?`<div class="det"><strong>${date}</strong></div>`:''}
+      ${time?`<div class="det">${time}</div>`:''}
+      ${venue?`<div class="det" style="margin-top:6px;"><strong>${venue}</strong></div>`:''}
+      ${theme?`<div class="tag-box">${theme}</div>`:''}
+      ${dress?`<div class="det" style="font-style:italic;">${dress}</div>`:''}
+      ${list18?`<div class="sponsors"><div class="sponsors-title">18 Roses &amp; Candles</div>${list18.replace(/\n/g,' &middot; ')}</div>`:''}
+      ${msg?`<div class="msg">${msg}</div>`:''}
+      ${rsvp||rsvpdate?`<div class="rsvp">RSVP${rsvpdate?' by '+fmtDate(rsvpdate):''} &nbsp;&middot;&nbsp; ${rsvp}</div>`:''}`;
+  }
+  else if(eventId==='christening') {
+    const baby = g('e-baby')||'Baby Sofia';
+    const nick = g('e-nick');
+    const parents = g('e-parents');
+    const ninong = g('e-ninong');
+    const date = fmtDate(g('e-date'));
+    const time = g('e-time');
+    const church = g('e-church');
+    const reception = g('e-reception');
+    const rtime = g('e-rtime');
+    const rsvp = g('e-rsvp');
+    const msg = g('e-msg');
+
+    body = `
+      <div class="cross-icon">&#10013;</div>
+      <div class="ey">Christening Celebration</div>
+      <div class="dv"></div>
+      <h1>${baby}</h1>
+      ${photoBlock}
+      ${nick?`<div class="det">&ldquo;${nick}&rdquo;</div>`:''}
+      ${parents?`<div class="by" style="margin-top:8px;">Beloved ${nick?'child':'son/daughter'} of<br/><strong>${parents}</strong></div>`:''}
+      <div class="dove-row">&#128570; &#128570; &#128570;</div>
+      ${date?`<div class="det"><strong>${date}</strong></div>`:''}
+      ${time?`<div class="det">${time}</div>`:''}
+      ${church?`<div class="det" style="margin-top:6px;"><strong>${church}</strong></div>`:''}
+      ${reception?`<div class="recbox"><strong>Reception follows</strong><br/>${reception}${rtime?' &middot; '+rtime:''}</div>`:''}
+      ${ninong?`<div class="sponsors"><div class="sponsors-title">Ninong &amp; Ninang</div>${ninong.replace(/\n/g,'<br/>')}</div>`:''}
+      ${msg?`<div class="verse">${msg}</div>`:''}
+      ${rsvp?`<div class="rsvp">RSVP &nbsp;&middot;&nbsp; ${rsvp}</div>`:''}`;
+  }
+  else if(eventId==='birthday'||eventId==='kidsbday') {
+    const name = g('e-name')||'Celebrant';
+    const age = g('e-age');
+    const host = g('e-host');
+    const date = fmtDate(g('e-date'));
+    const time = g('e-time');
+    const venue = g('e-venue');
+    const theme = g('e-theme');
+    const dress = g('e-dress');
+    const rsvp = g('e-rsvp');
+    const msg = g('e-msg');
+
+    // Kids themed body — more playful
+    if(eventId==='kidsbday') {
+      const kTheme = KIDS_THEMES.find(x=>x.id===t.id);
+      const themeEmoji = kTheme ? kTheme.icon : '🎉';
+      body = `
+        <div class="ey">${host||'You are invited'}</div>
+        <div class="by" style="font-size:11px;">${host?'invites you to celebrate':''}</div>
+        <div class="dv"></div>
+        <h1>${name}</h1>
+        ${photoBlock}
+        ${age?`<div class="age">${themeEmoji} Turning ${age}! ${themeEmoji}</div>`:''}
+        <div class="dv"></div>
+        ${date?`<div class="det"><strong>${date}</strong></div>`:''}
+        ${time?`<div class="det">${time}</div>`:''}
+        ${venue?`<div class="det"><strong>${venue}</strong></div>`:''}
+        ${dress?`<div class="det" style="font-style:italic;">${dress}</div>`:''}
+        ${msg?`<div class="msg">${msg}</div>`:''}
+        ${rsvp?`<div class="rsvp">RSVP &nbsp;&middot;&nbsp; ${rsvp}</div>`:''}`;
+    } else {
+      body = `
+        ${host?`<div class="ey">${host}</div><div class="by">invites you to celebrate</div>`:'<div class="ey">You are invited to celebrate</div>'}
+        <div class="dv"></div>
+        <h1>${name}</h1>
+        ${photoBlock}
+        ${age?`<div class="big-num">${age}</div><div class="ey">years of blessings</div>`:''}
+        <div class="dv"></div>
+        ${date?`<div class="det"><strong>${date}</strong></div>`:''}
+        ${time?`<div class="det">${time}</div>`:''}
+        ${venue?`<div class="det" style="margin-top:6px;"><strong>${venue}</strong></div>`:''}
+        ${theme?`<div class="tag-box">${theme}</div>`:''}
+        ${dress?`<div class="det" style="font-style:italic;">${dress}</div>`:''}
+        ${msg?`<div class="msg">${msg}</div>`:''}
+        ${rsvp?`<div class="rsvp">RSVP &nbsp;&middot;&nbsp; ${rsvp}</div>`:''}`;
+    }
+  }
+  else if(eventId==='graduation') {
+    const name = g('e-name')||'Graduate';
+    const degree = g('e-degree');
+    const school = g('e-school');
+    const host = g('e-host');
+    const date = fmtDate(g('e-date'));
+    const time = g('e-time');
+    const venue = g('e-venue');
+    const party = g('e-party');
+    const rsvp = g('e-rsvp');
+    const msg = g('e-msg');
+
+    body = `
+      <div class="grad-icon">&#127891;</div>
+      <div class="ey">Graduation Celebration</div>
+      ${host?`<div class="by">${host}<br/>proudly announces the graduation of</div>`:'<div class="ey">Please join us in celebrating</div>'}
+      <div class="dv"></div>
+      <h1>${name}</h1>
+      ${photoBlockRect}
+      ${degree?`<div class="det" style="margin-top:4px;font-style:italic;">${degree}</div>`:''}
+      ${school?`<div class="det"><strong>${school}</strong></div>`:''}
+      <div class="dv"></div>
+      ${date?`<div class="det"><strong>${date}</strong></div>`:''}
+      ${time?`<div class="det">${time}</div>`:''}
+      ${venue?`<div class="det" style="margin-top:6px;"><strong>${venue}</strong></div>`:''}
+      ${party?`<div class="recbox"><strong>Celebration party</strong><br/>${party}</div>`:''}
+      ${msg?`<div class="msg">${msg}</div>`:''}
+      ${rsvp?`<div class="rsvp">RSVP &nbsp;&middot;&nbsp; ${rsvp}</div>`:''}`;
+  }
+  else if(eventId==='anniversary') {
+    const husband = g('e-husband')||'Husband';
+    const wife = g('e-wife')||'Wife';
+    const years = g('e-years');
+    const host = g('e-host');
+    const date = fmtDate(g('e-date'));
+    const time = g('e-time');
+    const venue = g('e-venue');
+    const dress = g('e-dress');
+    const rsvp = g('e-rsvp');
+    const msg = g('e-msg');
+
+    body = `
+      ${host?`<div class="ey">${host}</div><div class="by">joyfully invites you to celebrate</div>`:'<div class="ey">Please join us in celebrating</div>'}
+      ${years?`<div class="big-num">${years}</div><div class="ey">years of love &amp; commitment</div>`:''}
+      <div class="dv"></div>
+      <h1><em>${husband}</em></h1>
+      <div class="amp">&amp;</div>
+      <h1><em>${wife}</em></h1>
+      ${photoBlock}
+      <div class="dv"></div>
+      ${date?`<div class="det"><strong>${date}</strong></div>`:''}
+      ${time?`<div class="det">${time}</div>`:''}
+      ${venue?`<div class="det" style="margin-top:6px;"><strong>${venue}</strong></div>`:''}
+      ${dress?`<div class="det" style="font-style:italic;">${dress}</div>`:''}
+      ${msg?`<div class="msg">${msg}</div>`:''}
+      ${rsvp?`<div class="rsvp">RSVP &nbsp;&middot;&nbsp; ${rsvp}</div>`:''}`;
+  }
+  else {
+    // Generic for babyshower, reunion, corporate, fiesta, other
+    const name = g('e-name')||g('e-group')||g('e-event')||g('e-mom')||eventLabel;
+    const host = g('e-host')||g('e-org')||g('e-company')||g('e-from')||'';
+    const date = fmtDate(g('e-date'));
+    const time = g('e-time');
+    const venue = g('e-venue')||g('e-church')||'';
+    const dress = g('e-dress');
+    const rsvp = g('e-rsvp');
+    const msg = g('e-msg')||g('e-desc')||g('e-patron')||'';
+
+    body = `
+      <div class="ey">${eventLabel}</div>
+      ${host?`<div class="by">${host}<br/>cordially invites you</div>`:'<div class="ey">You are cordially invited</div>'}
+      <div class="dv"></div>
+      <h1>${name}</h1>
+      ${photoBlock}
+      <div class="dv"></div>
+      ${date?`<div class="det"><strong>${date}</strong></div>`:''}
+      ${time?`<div class="det">${time}</div>`:''}
+      ${venue?`<div class="det" style="margin-top:6px;"><strong>${venue}</strong></div>`:''}
+      ${dress?`<div class="det" style="font-style:italic;">${dress}</div>`:''}
+      ${msg?`<div class="msg">${msg}</div>`:''}
+      ${rsvp?`<div class="rsvp">RSVP &nbsp;&middot;&nbsp; ${rsvp}</div>`:''}`;
+  }
+
+  // Common extra styles applied on top of every template CSS
+  const extraCSS = `
+    /* ── A5 PAGE SETUP ── */
+    *{box-sizing:border-box;}
+    html,body{margin:0;padding:0;width:148mm;height:210mm;overflow:hidden;}
+    body{display:flex;align-items:center;justify-content:center;background:#f0ece6;}
+    .card{
+      width:148mm !important;
+      height:210mm !important;
+      max-width:148mm !important;
+      min-height:210mm !important;
+      padding:10mm 12mm !important;
+      overflow:hidden;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:space-between;
+      box-sizing:border-box;
+    }
+    /* ── CONTENT STYLES ── */
+    .by{font-size:11px;color:inherit;opacity:.7;margin-bottom:3px;font-style:italic;line-height:1.4;}
+    .amp{font-size:1.4rem;font-style:italic;margin:3px 0;opacity:.7;}
+    .amp-small{font-size:10px;opacity:.5;margin:2px 0;}
+    .dv{width:40px;height:1px;background:currentColor;opacity:.3;margin:8px auto;}
+    .recbox{background:rgba(0,0,0,.04);border:1px solid rgba(0,0,0,.08);border-radius:5px;padding:6px 10px;margin:6px auto;width:100%;font-size:10px;line-height:1.7;}
+    .sponsors{margin:6px 0;padding:6px 10px;background:rgba(0,0,0,.03);border-top:1px solid rgba(0,0,0,.06);border-bottom:1px solid rgba(0,0,0,.06);font-size:9px;line-height:1.8;width:100%;}
+    .sponsors-title{font-size:8px;letter-spacing:.1em;text-transform:uppercase;opacity:.5;margin-bottom:3px;}
+    .msg{font-size:10px;font-style:italic;margin:8px auto;width:100%;line-height:1.6;opacity:.75;}
+    .verse{background:rgba(0,0,0,.03);border-left:3px solid currentColor;padding:6px 10px;margin:8px auto;width:100%;font-size:10px;font-style:italic;line-height:1.5;text-align:left;opacity:.8;}
+    .rsvp{margin-top:10px;padding-top:8px;border-top:1px solid rgba(0,0,0,.08);font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.6;}
+    .big-num{font-size:2.8rem;font-weight:300;line-height:1;margin:3px 0;}
+    .tag-box{display:inline-block;border:1px solid rgba(0,0,0,.15);padding:3px 10px;font-size:9px;letter-spacing:.1em;text-transform:uppercase;margin:5px 0;border-radius:3px;}
+    .cross-icon{font-size:2rem;margin-bottom:6px;opacity:.7;}
+    .grad-icon{font-size:2rem;margin-bottom:6px;}
+    .dove-row{font-size:1.2rem;letter-spacing:5px;margin:7px 0;opacity:.6;}
+    .photo-frame{width:90px;height:90px;border-radius:50%;overflow:hidden;margin:7px auto;border:2.5px solid currentColor;opacity:.9;flex-shrink:0;}
+    .photo-frame img{width:100%;height:100%;object-fit:cover;}
+    .photo-frame-rect{width:120px;height:80px;border-radius:5px;overflow:hidden;margin:7px auto;border:2px solid rgba(0,0,0,.12);}
+    .photo-frame-rect img{width:100%;height:100%;object-fit:cover;}
+    /* ── PRINT ── */
+    @media print{
+      html,body{background:white !important;}
+      @page{size:148mm 210mm;margin:0;}
+      body{width:148mm;height:210mm;margin:0;padding:0;}
+      .card{width:148mm !important;height:210mm !important;padding:10mm 12mm !important;}
+    }`;
+
+  // Use kids theme CSS if applicable
+  const kidsTheme = KIDS_THEMES.find(x=>x.id===t.id);
+  const templateCSS = kidsTheme ? kidsTheme.css : t.css;
+
+  // Photo HTML block (shown if photo was uploaded)
+  const photoBlock = photoUrl ? `
+    <div class="photo-frame">
+      <img src="${photoUrl}" alt="Event photo"/>
+    </div>` : '';
+
+  const photoBlockRect = photoUrl ? `
+    <div class="photo-frame-rect">
+      <img src="${photoUrl}" alt="Event photo"/>
+    </div>` : '';
+
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=148mm, initial-scale=1"/>
+<title>Invitation — ${v['c-name']||eventLabel}</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Tangerine:wght@400;700&family=Dancing+Script:wght@500;700&display=swap" rel="stylesheet"/>
+<style>
+${templateCSS}
+${extraCSS}
+</style>
+</head>
+<body>
+<div class="card">${body}</div>
+</body>
+</html>`;
+}
+
 function resetFlow(){
+  photoDataUrl='';
+  removePhoto({stopPropagation:()=>{}});
   state={event:null,template:null,qty:50,generatedHTML:''};
   document.querySelectorAll('.ec').forEach(c=>c.classList.remove('sel'));
   document.querySelectorAll('.tc').forEach(c=>c.classList.remove('sel'));
