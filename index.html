@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>InviteForge PH — Custom Invitation Orders</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{--ink:#1a1714;--ink2:#4a4540;--ink3:#8a837c;--paper:#faf8f5;--paper2:#f2ede6;--paper3:#e8e0d5;--gold:#b8935a;--goldl:#f7edd8;--goldd:#7a5c2a;--acc:#7c5cbf;--accbg:#f0ebfa;--grn:#2a6e4a;--grnl:#e6f4ec;--red:#c0392b;--r:10px;--sh:0 2px 16px rgba(26,23,20,.09);}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;}
+nav{background:var(--ink);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:58px;position:sticky;top:0;z-index:100;}
+.logo{font-family:'Cormorant Garamond',serif;font-size:22px;color:var(--gold);letter-spacing:.05em;}
+.logo em{color:#fff;font-style:italic;}
+.logo small{font-size:11px;color:rgba(255,255,255,.4);font-family:'Inter',sans-serif;font-style:normal;margin-left:6px;letter-spacing:.1em;text-transform:uppercase;}
+.nav-contact{font-size:12px;color:rgba(255,255,255,.5);text-align:right;line-height:1.7;}
+.nav-contact a{color:var(--gold);text-decoration:none;}
+.hero{background:var(--ink);padding:4rem 2rem 3rem;text-align:center;position:relative;}
+.hero::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(184,147,90,.4),transparent);}
+.hero-pre{font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem;}
+.hero h1{font-family:'Cormorant Garamond',serif;font-size:clamp(2.2rem,5vw,3.6rem);font-weight:300;color:#fff;line-height:1.18;margin-bottom:.8rem;}
+.hero h1 em{font-style:italic;color:var(--gold);}
+.hero p{color:rgba(255,255,255,.55);font-size:.9rem;max-width:480px;margin:0 auto 1.5rem;line-height:1.75;}
+.steps-row{display:flex;gap:0;justify-content:center;max-width:750px;margin:0 auto;flex-wrap:wrap;}
+.sp{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,.45);padding:5px 0;}
+.sp .n{width:22px;height:22px;border-radius:50%;background:rgba(184,147,90,.2);border:1px solid rgba(184,147,90,.35);color:var(--gold);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sp .arr{color:rgba(255,255,255,.18);margin:0 10px;}
+.flow{max-width:980px;margin:0 auto;padding:2.5rem 1.5rem;}
+.step-hdr{margin-bottom:1.8rem;}
+.step-hdr .tag{font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--gold);margin-bottom:.4rem;}
+.step-hdr h2{font-family:'Cormorant Garamond',serif;font-size:1.9rem;font-weight:400;color:var(--ink);}
+.step-hdr p{font-size:.88rem;color:var(--ink3);margin-top:.3rem;line-height:1.6;}
+.progress{display:flex;gap:0;margin-bottom:2.5rem;background:var(--paper2);border-radius:40px;padding:4px;border:1px solid var(--paper3);max-width:650px;}
+.ps{flex:1;text-align:center;padding:8px 4px;border-radius:36px;font-size:11px;font-weight:500;color:var(--ink3);transition:all .3s;}
+.ps.active{background:var(--ink);color:#fff;}
+.ps.done{background:var(--grnl);color:var(--grn);}
+.event-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+.ec{background:#fff;border:1.5px solid var(--paper3);border-radius:12px;padding:1.2rem .8rem;text-align:center;cursor:pointer;transition:all .2s;}
+.ec:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--sh);}
+.ec.sel{border-color:var(--acc);background:var(--accbg);box-shadow:0 0 0 3px rgba(124,92,191,.1);}
+.ec-icon{font-size:1.8rem;margin-bottom:.5rem;}
+.ec-name{font-size:12px;font-weight:600;color:var(--ink);}
+.ec-desc{font-size:10px;color:var(--ink3);margin-top:2px;line-height:1.4;}
+.tpl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}
+.tc{background:#fff;border:1.5px solid var(--paper3);border-radius:12px;overflow:hidden;cursor:pointer;transition:all .2s;position:relative;}
+.tc:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--sh);}
+.tc.sel{border-color:var(--acc);box-shadow:0 0 0 3px rgba(124,92,191,.1);}
+.tc-swatch{height:80px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;letter-spacing:3px;}
+.tc-info{padding:9px 11px;}
+.tc-name{font-size:12px;font-weight:600;color:var(--ink);}
+.tc-mood{font-size:10px;color:var(--ink3);margin-top:2px;}
+.tc-check{position:absolute;top:7px;right:7px;width:20px;height:20px;background:var(--acc);border-radius:50%;color:#fff;font-size:11px;display:none;align-items:center;justify-content:center;}
+.tc.sel .tc-check{display:flex;}
+.order-form{background:#fff;border:1px solid var(--paper3);border-radius:14px;padding:1.8rem;box-shadow:var(--sh);}
+.fs{margin-bottom:1.6rem;padding-bottom:1.6rem;border-bottom:1px solid var(--paper2);}
+.fs:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.fs-title{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);margin-bottom:.9rem;}
+.fg{margin-bottom:.9rem;}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+label{display:block;font-size:12px;font-weight:500;color:var(--ink2);margin-bottom:3px;}
+label .req{color:var(--red);margin-left:2px;}
+input,textarea,select{width:100%;padding:9px 11px;border:1.5px solid var(--paper3);border-radius:8px;font-family:'Inter',sans-serif;font-size:13px;color:var(--ink);background:var(--paper);outline:none;transition:border-color .15s;}
+input:focus,textarea:focus,select:focus{border-color:var(--acc);background:#fff;}
+textarea{resize:vertical;min-height:70px;line-height:1.5;}
+.hint{font-size:10px;color:var(--ink3);margin-top:3px;line-height:1.5;}
+.qty-row{display:flex;align-items:center;gap:8px;}
+.qty-btn{width:34px;height:34px;border:1.5px solid var(--paper3);border-radius:7px;background:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--ink2);transition:all .15s;}
+.qty-btn:hover{border-color:var(--gold);color:var(--gold);}
+.qty-val{font-size:17px;font-weight:600;min-width:30px;text-align:center;}
+.summary-card{background:var(--goldl);border:1px solid #e0c898;border-radius:12px;padding:1.4rem;}
+.sum-row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;gap:10px;}
+.sum-lbl{color:var(--ink3);font-size:12px;flex-shrink:0;}
+.sum-val{color:var(--ink);font-weight:500;text-align:right;}
+.sum-div{border:none;border-top:1px solid #d4b878;margin:8px 0;}
+.price-note{font-size:11px;color:var(--goldd);margin-top:7px;line-height:1.5;}
+.notice{background:var(--grnl);border:1px solid #a8d8bc;border-radius:9px;padding:11px 14px;font-size:12px;color:var(--grn);margin-bottom:1.4rem;line-height:1.6;}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:11px 22px;border-radius:var(--r);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:all .18s;text-decoration:none;}
+.btn-ink{background:var(--ink);color:#fff;}
+.btn-ink:hover{background:#2d2926;}
+.btn-gold{background:var(--gold);color:var(--ink);font-weight:600;}
+.btn-gold:hover{background:#d4a96a;}
+.btn-ghost{background:transparent;border:1.5px solid var(--paper3);color:var(--ink2);}
+.btn-ghost:hover{border-color:var(--gold);color:var(--ink);}
+.btn:disabled{opacity:.45;cursor:not-allowed;}
+.btn-row{display:flex;gap:10px;margin-top:1.4rem;flex-wrap:wrap;}
+
+/* GENERATING SCREEN */
+.gen-screen{text-align:center;padding:3rem 1rem;}
+.gen-spinner{width:60px;height:60px;border:3px solid var(--paper3);border-top-color:var(--gold);border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 1.5rem;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.gen-screen h2{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:400;color:var(--ink);margin-bottom:.6rem;}
+.gen-screen p{color:var(--ink3);font-size:.9rem;line-height:1.7;max-width:400px;margin:0 auto;}
+.gen-steps{display:flex;flex-direction:column;gap:8px;max-width:320px;margin:1.5rem auto 0;text-align:left;}
+.gen-step{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink3);padding:6px 0;}
+.gen-step.active{color:var(--ink);font-weight:500;}
+.gen-step.done{color:var(--grn);}
+.gen-step-icon{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--paper3);display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0;}
+.gen-step.active .gen-step-icon{border-color:var(--gold);background:var(--goldl);color:var(--goldd);}
+.gen-step.done .gen-step-icon{border-color:var(--grn);background:var(--grnl);color:var(--grn);}
+
+/* RESULT SCREEN */
+.result-screen{}
+.result-toolbar{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid var(--paper3);border-radius:12px 12px 0 0;padding:12px 16px;flex-wrap:wrap;gap:10px;}
+.result-toolbar-left{display:flex;align-items:center;gap:10px;}
+.result-ref{font-size:12px;font-weight:600;color:var(--acc);}
+.result-toolbar-right{display:flex;gap:8px;flex-wrap:wrap;}
+.preview-wrap{border:1px solid var(--paper3);border-top:none;border-radius:0 0 12px 12px;overflow:hidden;background:#888;padding:20px;display:flex;justify-content:center;}
+#inv-frame{width:100%;max-width:520px;min-height:460px;border:none;border-radius:8px;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.2);}
+
+/* SUCCESS */
+.success-box{background:#fff;border:1px solid var(--paper3);border-radius:14px;padding:2.5rem 2rem;text-align:center;box-shadow:var(--sh);margin-top:1.5rem;}
+.success-box h3{font-family:'Cormorant Garamond',serif;font-size:1.6rem;font-weight:400;color:var(--ink);margin-bottom:.6rem;}
+.success-box p{color:var(--ink3);font-size:.9rem;line-height:1.7;max-width:460px;margin:0 auto .5rem;}
+.contact-box{background:var(--goldl);border:1px solid #e0c898;border-radius:10px;padding:1.2rem 1.5rem;margin:1.2rem auto;max-width:380px;text-align:left;}
+.contact-box .cb-title{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);margin-bottom:.6rem;}
+.contact-box p{font-size:13px;color:var(--ink);margin-bottom:.3rem;line-height:1.7;}
+.contact-box a{color:var(--goldd);font-weight:600;text-decoration:none;}
+.ref-num{display:inline-block;background:var(--ink);color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:1.3rem;padding:5px 18px;border-radius:7px;letter-spacing:.1em;margin:.8rem 0;}
+.hidden{display:none!important;}
+footer{background:var(--ink);color:rgba(255,255,255,.35);text-align:center;padding:1.6rem 2rem;font-size:12px;margin-top:4rem;}
+footer strong{color:var(--gold);font-family:'Cormorant Garamond',serif;font-size:14px;}
+footer a{color:rgba(255,255,255,.5);text-decoration:none;}
+@media(max-width:580px){.frow{grid-template-columns:1fr;}.tpl-grid{grid-template-columns:1fr 1fr;}.event-grid{grid-template-columns:repeat(3,1fr);}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="logo">Invite<em>Forge</em> <small>PH</small></div>
+  <div class="nav-contact">
+    <a href="tel:09063964052">&#128222; 0906 396 4052</a><br/>
+    <a href="mailto:areymar36@gmail.com">areymar36@gmail.com</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <p class="hero-pre">Custom Invitation Printing &mdash; Philippines</p>
+  <h1>Your event deserves<br/><em>a beautiful invitation</em></h1>
+  <p>Order custom invitations online. AI generates a design preview instantly &mdash; we print and deliver.</p>
+  <div class="steps-row">
+    <div class="sp"><span class="n">1</span>Choose event</div>
+    <div class="sp"><span class="arr">&#8250;</span><span class="n">2</span>Pick style</div>
+    <div class="sp"><span class="arr">&#8250;</span><span class="n">3</span>Fill details</div>
+    <div class="sp"><span class="arr">&#8250;</span><span class="n">4</span>Auto-generate preview</div>
+    <div class="sp"><span class="arr">&#8250;</span><span class="n">5</span>Submit &amp; confirm</div>
+  </div>
+</section>
+
+<div class="flow">
+  <div class="progress" id="progress">
+    <div class="ps active" id="ps1">1 &middot; Event</div>
+    <div class="ps" id="ps2">2 &middot; Style</div>
+    <div class="ps" id="ps3">3 &middot; Details</div>
+    <div class="ps" id="ps4">4 &middot; Preview</div>
+    <div class="ps" id="ps5">5 &middot; Submit</div>
+  </div>
+
+  <!-- S1: EVENT -->
+  <div id="s1">
+    <div class="step-hdr"><div class="tag">Step 1 of 5</div><h2>What is the occasion?</h2></div>
+    <div class="event-grid">
+      <div class="ec" onclick="pickEvent('wedding',this)"><div class="ec-icon">&#128141;</div><div class="ec-name">Wedding</div><div class="ec-desc">Reception, ceremony</div></div>
+      <div class="ec" onclick="pickEvent('debut',this)"><div class="ec-icon">&#127801;</div><div class="ec-name">Debut / Sweet 18</div><div class="ec-desc">18th birthday ball</div></div>
+      <div class="ec" onclick="pickEvent('birthday',this)"><div class="ec-icon">&#127874;</div><div class="ec-name">Birthday</div><div class="ec-desc">Any age celebration</div></div>
+      <div class="ec" onclick="pickEvent('christening',this)"><div class="ec-icon">&#10013;</div><div class="ec-name">Christening</div><div class="ec-desc">Baptism, blessing</div></div>
+      <div class="ec" onclick="pickEvent('babyshower',this)"><div class="ec-icon">&#128118;</div><div class="ec-name">Baby Shower</div><div class="ec-desc">Gender reveal, pamper</div></div>
+      <div class="ec" onclick="pickEvent('graduation',this)"><div class="ec-icon">&#127891;</div><div class="ec-name">Graduation</div><div class="ec-desc">College, high school</div></div>
+      <div class="ec" onclick="pickEvent('anniversary',this)"><div class="ec-icon">&#10084;</div><div class="ec-name">Anniversary</div><div class="ec-desc">Vow renewal, jubilee</div></div>
+      <div class="ec" onclick="pickEvent('reunion',this)"><div class="ec-icon">&#128106;</div><div class="ec-name">Reunion</div><div class="ec-desc">Family, batch, barkada</div></div>
+      <div class="ec" onclick="pickEvent('corporate',this)"><div class="ec-icon">&#127970;</div><div class="ec-name">Corporate</div><div class="ec-desc">Gala, awarding night</div></div>
+      <div class="ec" onclick="pickEvent('fiesta',this)"><div class="ec-icon">&#127881;</div><div class="ec-name">Fiesta / Party</div><div class="ec-desc">Barangay, town fiesta</div></div>
+      <div class="ec" onclick="pickEvent('kasalan',this)"><div class="ec-icon">&#128149;</div><div class="ec-name">Kasalan</div><div class="ec-desc">Church wedding (Tagalog)</div></div>
+      <div class="ec" onclick="pickEvent('other',this)"><div class="ec-icon">&#10022;</div><div class="ec-name">Other</div><div class="ec-desc">Custom occasion</div></div>
+    </div>
+    <div class="btn-row"><button class="btn btn-ink" id="s1next" onclick="goStep(2)" disabled>Next: Choose style &rarr;</button></div>
+  </div>
+
+  <!-- S2: TEMPLATE -->
+  <div id="s2" class="hidden">
+    <div class="step-hdr"><div class="tag">Step 2 of 5</div><h2>Choose your invitation style</h2><p>The AI will generate a full invitation design in this style.</p></div>
+    <div class="tpl-grid" id="tpl-grid"></div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(1)">&larr; Back</button>
+      <button class="btn btn-ink" id="s2next" onclick="goStep(3)" disabled>Next: Fill in details &rarr;</button>
+    </div>
+  </div>
+
+  <!-- S3: FORM -->
+  <div id="s3" class="hidden">
+    <div class="step-hdr"><div class="tag">Step 3 of 5</div><h2>Fill in your event details</h2><p>Complete the form below. The AI will use these to generate your invitation.</p></div>
+    <div class="order-form">
+      <div class="fs">
+        <div class="fs-title">&#128100; Your contact information</div>
+        <div class="frow">
+          <div class="fg"><label>Full name <span class="req">*</span></label><input type="text" id="c-name" placeholder="Juan dela Cruz"/></div>
+          <div class="fg"><label>Mobile number <span class="req">*</span></label><input type="tel" id="c-phone" placeholder="09XX XXX XXXX"/></div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>Email address <span class="req">*</span></label><input type="email" id="c-email" placeholder="juan@email.com"/></div>
+          <div class="fg"><label>City / Municipality</label><input type="text" id="c-city" placeholder="Makati City"/></div>
+        </div>
+      </div>
+      <div class="fs" id="event-fields">
+        <div class="fs-title" id="ef-title">&#127881; Event details</div>
+        <div id="ef-body"></div>
+      </div>
+      <div class="fs">
+        <div class="fs-title">&#128220; Order specifications</div>
+        <input type="hidden" id="o-size" value="A5"/>
+        <div class="fg">
+          <label>Number of invitations <span class="req">*</span></label>
+          <div class="qty-row">
+            <button class="qty-btn" onclick="changeQty(-10)">&#8722;</button>
+            <div class="qty-val" id="qty-d">50</div>
+            <button class="qty-btn" onclick="changeQty(10)">+</button>
+          </div>
+          <input type="hidden" id="o-qty" value="50"/>
+          <div class="hint">A5 size (148mm &times; 210mm) &middot; Minimum 20 pcs &middot; Price quoted after confirmation</div>
+        </div>
+        <div class="frow">
+          <div class="fg"><label>Color preference / Theme</label><input type="text" id="o-color" placeholder="e.g. Gold & white, Blush pink, Navy blue"/></div>
+          <div class="fg"><label>Delivery preference</label><select id="o-delivery"><option value="Pick up">Pick up from us</option><option value="Metro Manila delivery">Deliver (Metro Manila)</option><option value="Provincial delivery">Provincial (Lalamove / LBC)</option></select></div>
+        </div>
+        <div class="fg"><label>Additional notes</label><textarea id="o-notes" rows="2" placeholder="e.g. Include RSVP card, specific font preference, etc."></textarea></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(2)">&larr; Back</button>
+      <button class="btn btn-gold" onclick="goGenerate()">&#10022; Generate my invitation preview &rarr;</button>
+    </div>
+  </div>
+
+  <!-- S4: GENERATING -->
+  <div id="s4" class="hidden">
+    <div class="gen-screen">
+      <div class="gen-spinner"></div>
+      <h2>Creating your invitation&hellip;</h2>
+      <p>Our AI designer is building your custom invitation based on your event details and chosen style.</p>
+      <div class="gen-steps">
+        <div class="gen-step" id="gs1"><div class="gen-step-icon">1</div>Reading your event details</div>
+        <div class="gen-step" id="gs2"><div class="gen-step-icon">2</div>Applying your chosen style</div>
+        <div class="gen-step" id="gs3"><div class="gen-step-icon">3</div>Designing the layout</div>
+        <div class="gen-step" id="gs4"><div class="gen-step-icon">4</div>Finalizing print-ready output</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S5: PREVIEW + SUBMIT -->
+  <div id="s5" class="hidden">
+    <div class="step-hdr"><div class="tag">Step 4 of 5 &mdash; Preview</div><h2>Your invitation preview</h2><p>This is the AI-generated design. After submitting, Reymar will finalize and print it.</p></div>
+    <div class="result-toolbar">
+      <div class="result-toolbar-left">
+        <span class="result-ref" id="prev-ref"></span>
+        <span style="font-size:12px;color:var(--ink3);" id="prev-info"></span>
+      </div>
+      <div class="result-toolbar-right">
+        <button class="btn btn-ghost" style="padding:7px 14px;font-size:12px;" onclick="regenInvite()">&#8635; Regenerate</button>
+        <button class="btn btn-ghost" style="padding:7px 14px;font-size:12px;" onclick="printPreview()">&#128424; Print preview</button>
+      </div>
+    </div>
+    <div class="preview-wrap">
+      <iframe id="inv-frame" title="Invitation preview"></iframe>
+    </div>
+    <div class="notice" style="margin-top:1.2rem;">&#9432; This is an AI-generated preview. The final printed version will be professionally reviewed and refined by Reymar before printing.</div>
+    <div class="btn-row">
+      <button class="btn btn-ghost" onclick="goStep(3)">&larr; Edit details</button>
+      <button class="btn btn-gold" onclick="submitOrder()">&#10022; Submit this order &rarr;</button>
+    </div>
+  </div>
+
+  <!-- S6: SUCCESS -->
+  <div id="s6" class="hidden">
+    <div class="success-box">
+      <div style="font-size:3rem;margin-bottom:1rem;">&#127881;</div>
+      <h3>Order submitted!</h3>
+      <p>Your invitation order has been received. Your reference number:</p>
+      <div class="ref-num" id="ref-num">IF-000000</div>
+      <p>Reymar will contact you within <strong>24 hours</strong> to confirm the final design and provide a price quotation before printing.</p>
+      <div class="contact-box">
+        <div class="cb-title">Contact us directly</div>
+        <p>&#128222; <a href="tel:09063964052">0906 396 4052</a> (call or text / Viber)</p>
+        <p>&#128140; <a href="mailto:areymar36@gmail.com">areymar36@gmail.com</a></p>
+      </div>
+      <p style="font-size:12px;color:var(--ink3);">Once your invitations are ready, you will receive an email to arrange pickup or delivery.</p>
+      <div class="btn-row" style="justify-content:center;margin-top:1.5rem;">
+        <button class="btn btn-ghost" onclick="resetFlow()">Place another order</button>
+        <a href="mailto:areymar36@gmail.com" class="btn btn-ink">Email us</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <p><strong>InviteForge PH</strong> &mdash; Custom Invitation Printing &middot; <a href="tel:09063964052">0906 396 4052</a> &middot; <a href="mailto:areymar36@gmail.com">areymar36@gmail.com</a></p>
+</footer>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────────
+let state = { event:null, template:null, qty:50, generatedHTML:'' };
+
+// ── TEMPLATES ─────────────────────────────────────────────────────
+const TEMPLATES = [
+  { id:'elegant-gold',    name:'Elegant Gold',     mood:'Classic & formal',    bg:'#f9f5ed', orn:'&#10022; &#10022; &#10022;', oc:'#b8935a',
+    css:'body{font-family:\'Playfair Display\',Georgia,serif;background:#f9f5ed;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#fff;max-width:500px;width:100%;padding:60px 50px;text-align:center;border:1px solid #d4b483;position:relative;}.card::before,.card::after{content:\'\';position:absolute;border:.5px solid #d4b483;}.card::before{top:8px;left:8px;right:8px;bottom:8px;}.card::after{top:14px;left:14px;right:14px;bottom:14px;}.ey{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:#b8935a;margin-bottom:16px;}.orn{font-size:24px;color:#b8935a;margin-bottom:14px;letter-spacing:6px;}h1{font-size:2.5rem;font-weight:400;color:#2a2016;line-height:1.2;margin-bottom:8px;}h1 em{font-style:italic;}.dv{width:60px;height:1px;background:#d4b483;margin:16px auto;}.det{font-size:14px;color:#6b5c40;line-height:2;margin:12px 0;}.det strong{display:block;color:#2a2016;font-size:15px;font-weight:400;}.rsvp{margin-top:22px;padding-top:16px;border-top:.5px solid #e8dcc8;font-size:11px;color:#9a8060;letter-spacing:.1em;text-transform:uppercase;}@media print{body{background:white;}}' },
+  { id:'floral-romance',  name:'Floral Romance',   mood:'Soft & feminine',     bg:'#fff6f9', orn:'&#127800; &#127826; &#127804;', oc:'#d4788a',
+    css:'body{font-family:Georgia,serif;background:#fdf6f0;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:linear-gradient(135deg,#fff9f6,#fff3f8);max-width:500px;width:100%;padding:50px 42px;text-align:center;border-radius:18px;border:2px solid #f4c2c2;}.flowers{font-size:28px;margin-bottom:10px;letter-spacing:4px;}.ey{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#d4788a;margin-bottom:12px;}h1{font-size:2rem;color:#3d1f2a;line-height:1.3;margin-bottom:6px;font-style:italic;}.dv{font-size:18px;color:#f4a0b0;margin:10px 0;letter-spacing:3px;}.det{font-size:13px;color:#7a4a55;line-height:2;margin:12px 0;}.det strong{display:block;color:#3d1f2a;font-size:15px;}.rsvp{margin-top:18px;padding:12px;background:rgba(244,194,194,.15);border-radius:10px;font-size:11px;color:#9e6070;}@media print{body{background:white;}}' },
+  { id:'modern-minimal',  name:'Modern Minimal',   mood:'Bold & contemporary', bg:'#1a1a1a', orn:'&#9632; &#9632; &#9632;', oc:'#c8a96e',
+    css:'body{font-family:\'Helvetica Neue\',sans-serif;background:#f2f2f0;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#1a1a1a;max-width:500px;width:100%;padding:60px 50px;color:white;}.lt{height:3px;background:#fff;width:40px;margin-bottom:28px;}.ey{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:10px;}h1{font-size:2.8rem;line-height:1;color:#fff;margin-bottom:12px;letter-spacing:.02em;font-weight:700;}.al{height:2px;background:linear-gradient(90deg,#c8a96e,transparent);margin:20px 0;}.det{font-size:13px;color:rgba(255,255,255,.6);line-height:2.2;}.det strong{color:#fff;font-size:14px;font-weight:500;}.rsvp{margin-top:22px;border-top:1px solid rgba(255,255,255,.1);padding-top:16px;font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.08em;}@media print{.card{background:#1a1a1a !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}' },
+  { id:'rustic-kraft',    name:'Rustic Kraft',     mood:'Warm & handcrafted',  bg:'#f4ead0', orn:'&#127807; &#127807; &#127807;', oc:'#8b6035',
+    css:'body{font-family:Georgia,serif;background:#c9ab82;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#f4ead0;max-width:480px;width:100%;padding:50px 44px;text-align:center;border-radius:3px;box-shadow:4px 4px 0 #a0845a;}.orn{font-size:20px;margin-bottom:12px;opacity:.6;}.ey{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#8b6035;margin-bottom:7px;}h1{font-size:2.4rem;font-weight:700;color:#4a2c0a;line-height:1.15;margin-bottom:8px;}.dv{font-size:16px;color:#a07040;margin:10px 0;letter-spacing:4px;}.det{font-size:15px;color:#6b4820;line-height:1.9;}.det strong{display:block;color:#4a2c0a;font-size:17px;font-weight:700;}.rsvp{margin-top:16px;font-size:13px;color:#8b6035;font-style:italic;}@media print{body{background:#c9ab82 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}' },
+  { id:'navy-formal',     name:'Navy Formal',      mood:'Sophisticated',       bg:'#0d1b3e', orn:'&#8258; &#8258; &#8258;', oc:'#8090b0',
+    css:'body{font-family:sans-serif;background:#d0d8e4;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#0d1b3e;max-width:500px;width:100%;padding:55px 45px;text-align:center;border:1px solid #8090b0;position:relative;overflow:hidden;}.card::before{content:\'\';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,transparent,#c0c8d8,transparent);}.crest{font-size:36px;margin-bottom:12px;opacity:.7;}.ey{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:#8090b0;margin-bottom:12px;}h1{font-size:1.8rem;font-weight:600;color:#e8ecf2;line-height:1.25;margin-bottom:5px;}.rule{border:none;border-top:1px solid rgba(192,200,216,.3);margin:16px auto;width:80%;}.det{font-size:13px;color:#9aabcc;line-height:2.2;}.det strong{color:#dde4f0;font-size:14px;font-weight:400;}.bdg{display:inline-block;border:1px solid #8090b0;padding:5px 18px;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#8090b0;margin-top:12px;}.rsvp{margin-top:18px;border-top:1px solid rgba(192,200,216,.15);padding-top:14px;font-size:10px;color:#5a6880;letter-spacing:.12em;text-transform:uppercase;}@media print{.card{background:#0d1b3e !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}' },
+  { id:'black-luxe',      name:'Black Luxe',       mood:'Ultra-premium VIP',   bg:'#000', orn:'&#10022; &#10022; &#10022;', oc:'#c8a840',
+    css:'body{font-family:sans-serif;background:#111;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#000;max-width:500px;width:100%;padding:60px 50px;text-align:center;border:1px solid #7a6020;position:relative;}.ey{font-size:9px;letter-spacing:.28em;text-transform:uppercase;color:#7a6020;margin-bottom:16px;}.mono{font-size:46px;color:#c8a840;line-height:1;margin-bottom:7px;font-style:italic;}h1{font-size:1.6rem;font-weight:400;color:#e8d090;line-height:1.3;margin-bottom:3px;}h1 em{font-style:italic;}.orn{color:#7a6020;font-size:16px;letter-spacing:8px;margin:14px 0;}.det{font-size:12px;color:#9a8040;line-height:2.4;letter-spacing:.05em;}.det strong{color:#e0c870;font-size:13px;font-weight:300;}.rule{border:none;border-top:1px solid #3a2a00;margin:16px auto;width:60%;}.rsvp{margin-top:16px;font-size:10px;color:#6a5020;letter-spacing:.2em;text-transform:uppercase;}@media print{.card{background:#000 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}' },
+  { id:'watercolor-soft', name:'Watercolor Soft',  mood:'Dreamy & romantic',   bg:'#f5f0fa', orn:'&#10022; &#10022; &#10022;', oc:'#c0a8d8',
+    css:'body{font-family:sans-serif;background:#e8e4f0;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#fff;max-width:500px;width:100%;padding:50px 42px;text-align:center;border-radius:5px;box-shadow:0 2px 36px rgba(150,120,180,.14);position:relative;overflow:hidden;}.card::before{content:\'\';position:absolute;top:-60px;right:-60px;width:180px;height:180px;background:radial-gradient(circle,rgba(200,160,220,.28),transparent 70%);}.card::after{content:\'\';position:absolute;bottom:-60px;left:-60px;width:180px;height:180px;background:radial-gradient(circle,rgba(160,200,220,.22),transparent 70%);}.ey{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#a090b8;margin-bottom:12px;}h1{font-size:2.6rem;color:#5a3a7a;line-height:1.2;margin-bottom:7px;font-style:italic;}.dv{font-size:14px;color:#c0a8d8;margin:10px 0;letter-spacing:6px;}.det{font-size:13px;color:#7a6890;line-height:2.1;}.det strong{display:block;color:#5a3a7a;font-size:14px;}.petal{font-size:20px;color:#d8a0c0;margin-top:12px;letter-spacing:3px;}.rsvp{margin-top:14px;padding-top:12px;border-top:1px solid #e8dff0;font-size:11px;color:#a090b8;}@media print{body{background:white;}}' },
+  { id:'rustic-floral',   name:'Rustic Floral PH', mood:'Filipino festive',    bg:'#fefaf0', orn:'&#127803; &#127804; &#127803;', oc:'#c07830',
+    css:'body{font-family:Georgia,serif;background:#e8d8b8;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#fefaf0;max-width:500px;width:100%;padding:50px 44px;text-align:center;border:2px solid #c8a060;border-radius:4px;}.flores{font-size:26px;margin-bottom:10px;letter-spacing:3px;}.ey{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#c07830;margin-bottom:10px;}h1{font-size:2.3rem;color:#5a2a0a;line-height:1.2;margin-bottom:6px;font-style:italic;}.dv{font-size:16px;color:#c8a060;margin:10px 0;letter-spacing:4px;}.det{font-size:14px;color:#6a3a18;line-height:2;}.det strong{display:block;color:#5a2a0a;font-size:15px;font-weight:700;}.ninong{background:#fdf4e4;border:1px solid #e0c080;border-radius:6px;padding:10px 14px;margin:10px 0;font-size:12px;color:#7a5020;line-height:1.7;}.rsvp{margin-top:14px;font-size:12px;color:#c07830;font-style:italic;}@media print{body{background:#e8d8b8 !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}' },
+  { id:'tropical-fiesta', name:'Tropical Fiesta',  mood:'Colorful & festive',  bg:'#fffef0', orn:'&#127796; &#127802; &#127821;', oc:'#0f9b8e',
+    css:'body{font-family:sans-serif;background:linear-gradient(135deg,#0f9b8e,#f7c948);display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#fffef0;max-width:500px;width:100%;padding:50px 42px;text-align:center;border-radius:22px;border:3px solid #f7c948;}.banner{font-size:28px;margin-bottom:10px;letter-spacing:4px;}.ey{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#0f9b8e;font-weight:600;margin-bottom:8px;}h1{font-size:2.2rem;font-weight:700;color:#d44000;line-height:1.2;margin-bottom:5px;}.dv{font-size:16px;color:#f7c948;margin:8px 0;letter-spacing:2px;}.det{font-size:13px;color:#4a5a20;line-height:2;}.det strong{display:block;color:#1a2a00;font-size:15px;font-weight:700;}.pill{display:inline-block;background:#0f9b8e;color:white;padding:7px 20px;border-radius:28px;font-size:12px;font-weight:600;margin-top:12px;}.rsvp{margin-top:16px;font-size:12px;color:#6a7a30;font-weight:600;}@media print{body{background:white;}}' },
+  { id:'debut-pink',      name:'Debut / Sweet 18', mood:'Elegant pink & gold',  bg:'#fceef5', orn:'&#127801; &#127801; &#127801;', oc:'#c0607a',
+    css:'body{font-family:sans-serif;background:linear-gradient(160deg,#fceef5,#fff0e0);display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#fff;max-width:500px;width:100%;padding:55px 45px;text-align:center;border:1px solid #f0c0d0;position:relative;}.card::before{content:\'\';position:absolute;top:10px;left:10px;right:10px;bottom:10px;border:.5px solid rgba(210,150,170,.35);}.rosette{font-size:28px;margin-bottom:10px;letter-spacing:4px;}.ey{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#c0607a;margin-bottom:12px;}h1{font-size:3.6rem;font-weight:700;color:#8a1a40;line-height:1.1;margin-bottom:4px;font-style:italic;}.age{font-size:13px;color:#c0607a;margin-bottom:16px;letter-spacing:.1em;}.dv{font-size:18px;color:#e8a0b8;margin:10px 0;letter-spacing:5px;}.det{font-size:13px;color:#7a3050;line-height:2;}.det strong{display:block;color:#8a1a40;font-size:15px;font-weight:500;}.rsvp{margin-top:16px;font-size:11px;color:#c0607a;letter-spacing:.08em;}@media print{body{background:white;}}' },
+  { id:'christening-blue',name:'Christening',      mood:'Pure & sacred',        bg:'#f0f8ff', orn:'&#10013; &#128570; &#10013;', oc:'#7ab0d8',
+    css:'body{font-family:sans-serif;background:linear-gradient(180deg,#deeeff,#f0f8ff);display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#fff;max-width:480px;width:100%;padding:55px 44px;text-align:center;border-radius:4px;border-top:3px solid #7ab0d8;border-bottom:3px solid #7ab0d8;}.cross{font-size:34px;margin-bottom:10px;color:#7ab0d8;}.ey{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#5a90c0;margin-bottom:12px;}h1{font-size:1.9rem;color:#2a4a7a;line-height:1.25;margin-bottom:5px;font-style:italic;}h2{font-size:1rem;color:#5a7aaa;margin-bottom:16px;}.dove{font-size:22px;color:#a0c8e8;margin:8px 0;letter-spacing:6px;}.det{font-size:13px;color:#4a6080;line-height:2.1;}.det strong{display:block;color:#2a4a7a;font-size:14px;font-weight:500;}.verse{margin:12px 0;padding:12px;background:#f0f8ff;border-left:3px solid #7ab0d8;font-style:italic;font-size:12px;color:#5a7aaa;text-align:left;line-height:1.6;}.rsvp{margin-top:14px;font-size:11px;color:#7ab0d8;letter-spacing:.1em;}@media print{body{background:white;}}' },
+  { id:'graduation-classic',name:'Graduation',     mood:'Academic & proud',     bg:'#fff', orn:'&#127891; &#127891; &#127891;', oc:'#8a7020',
+    css:'body{font-family:sans-serif;background:#e0d8c4;display:flex;align-items:center;justify-content:center;min-height:100vh;margin:0;padding:20px;}.card{background:#fff;max-width:500px;width:100%;padding:50px 44px;text-align:center;border-top:6px solid #1a2a6c;border-bottom:6px solid #1a2a6c;}.shield{font-size:40px;margin-bottom:8px;}.ey{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#8a7020;margin-bottom:8px;}h1{font-size:2rem;color:#1a2a6c;line-height:1.25;margin-bottom:3px;font-style:italic;}h2{font-size:1rem;color:#6a5010;margin-bottom:12px;}.dline{height:1px;background:linear-gradient(90deg,transparent,#c8a830,transparent);margin:12px 0;}.det{font-size:13px;color:#4a4430;line-height:2.1;}.det strong{display:block;color:#1a2a6c;font-size:14px;font-weight:600;}.seal{width:52px;height:52px;border-radius:50%;background:#1a2a6c;color:#c8a830;font-size:24px;margin:10px auto;display:flex;align-items:center;justify-content:center;}.rsvp{margin-top:12px;font-size:11px;color:#8a7a40;letter-spacing:.1em;}@media print{.card{border-top:6px solid #1a2a6c;border-bottom:6px solid #1a2a6c;-webkit-print-color-adjust:exact;print-color-adjust:exact;}}' }
+];
+
+// ── EVENT FORMS ───────────────────────────────────────────────────
+const EF = {
+  wedding:{title:'&#128141; Wedding details',body:`<div class="frow"><div class="fg"><label>Groom's full name <span class="req">*</span></label><input id="e-groom" placeholder="Juan dela Cruz"/></div><div class="fg"><label>Bride's full name <span class="req">*</span></label><input id="e-bride" placeholder="Maria Santos"/></div></div><div class="fg"><label>Parents of the groom</label><input id="e-pgroom" placeholder="Mr. & Mrs. Pedro dela Cruz"/></div><div class="fg"><label>Parents of the bride</label><input id="e-pbride" placeholder="Mr. & Mrs. Jose Santos"/></div><div class="fg"><label>Principal sponsors (ninong/ninang) — optional</label><textarea id="e-sponsors" rows="3" placeholder="List names, one per line&#10;e.g. Atty. & Mrs. Reyes"></textarea></div><div class="frow"><div class="fg"><label>Wedding date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time of ceremony</label><input id="e-time" placeholder="e.g. 3:00 PM"/></div></div><div class="fg"><label>Church / Ceremony venue <span class="req">*</span></label><input id="e-church" placeholder="Sto. Nino Parish Church, Makati City"/></div><div class="fg"><label>Reception venue <span class="req">*</span></label><input id="e-reception" placeholder="Grand Ballroom, Raffles Hotel, Makati City"/></div><div class="frow"><div class="fg"><label>Reception time</label><input id="e-rtime" placeholder="e.g. 6:00 PM"/></div><div class="fg"><label>Dress code</label><input id="e-dress" placeholder="e.g. Formal attire"/></div></div><div class="fg"><label>RSVP / Contact</label><input id="e-rsvp" placeholder="e.g. Call Maria at 09XX XXX XXXX"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. Together with their families, you are warmly invited..."></textarea></div>`},
+  debut:{title:'&#127801; Debut details',body:`<div class="frow"><div class="fg"><label>Debutante's full name <span class="req">*</span></label><input id="e-name" placeholder="Isabella Marie Santos"/></div><div class="fg"><label>Nickname</label><input id="e-nick" placeholder="Belle"/></div></div><div class="fg"><label>Parents / Hosted by</label><input id="e-parents" placeholder="Mr. & Mrs. Jose Santos"/></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 6:00 PM"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input id="e-venue" placeholder="Grand Ballroom, Hotel Name, City"/></div><div class="fg"><label>Theme / concept</label><input id="e-theme" placeholder="e.g. Enchanted Garden, Fairy Tale Princess"/></div><div class="frow"><div class="fg"><label>Attire / Dress code</label><input id="e-dress" placeholder="e.g. Formal, Cocktail"/></div><div class="fg"><label>RSVP deadline</label><input type="date" id="e-rsvpdate"/></div></div><div class="fg"><label>18 roses / 18 candles list (optional)</label><textarea id="e-18" rows="3" placeholder="List names if you want them on the invitation"></textarea></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Contact number or name"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. She's finally 18! Join us..."></textarea></div>`},
+  birthday:{title:'&#127874; Birthday details',body:`<div class="frow"><div class="fg"><label>Name of celebrant <span class="req">*</span></label><input id="e-name" placeholder="Full name"/></div><div class="fg"><label>Age turning</label><input id="e-age" placeholder="e.g. 7, 21, 50, 60"/></div></div><div class="fg"><label>Hosted by (optional)</label><input id="e-host" placeholder="e.g. The Santos Family"/></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 3:00 PM"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input id="e-venue" placeholder="Venue name and full address"/></div><div class="frow"><div class="fg"><label>Theme (optional)</label><input id="e-theme" placeholder="e.g. Unicorn, Superhero, Garden Party"/></div><div class="fg"><label>Attire (optional)</label><input id="e-dress" placeholder="e.g. Casual, Colorful"/></div></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Name and contact number"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. Come join us!"></textarea></div>`},
+  christening:{title:'&#10013; Christening / Baptism details',body:`<div class="frow"><div class="fg"><label>Baby's full name <span class="req">*</span></label><input id="e-baby" placeholder="Full baptismal name"/></div><div class="fg"><label>Baby's nickname</label><input id="e-nick" placeholder="e.g. Coco, Bea"/></div></div><div class="fg"><label>Parents' names <span class="req">*</span></label><input id="e-parents" placeholder="Mr. & Mrs. Juan dela Cruz"/></div><div class="fg"><label>Godparents (ninong/ninang) — optional</label><textarea id="e-ninong" rows="3" placeholder="List names, one per line"></textarea></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 10:00 AM"/></div></div><div class="fg"><label>Church / Venue <span class="req">*</span></label><input id="e-church" placeholder="Parish church name and address"/></div><div class="fg"><label>Reception venue</label><input id="e-reception" placeholder="Home address or venue"/></div><div class="fg"><label>Reception time</label><input id="e-rtime" placeholder="e.g. 12:00 PM (after the ceremony)"/></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Contact number"/></div><div class="fg"><label>Bible verse / message (optional)</label><textarea id="e-msg" rows="2" placeholder='e.g. "I can do all things through Christ..." Phil 4:13'></textarea></div>`},
+  babyshower:{title:'&#128118; Baby Shower details',body:`<div class="frow"><div class="fg"><label>Mom-to-be's name <span class="req">*</span></label><input id="e-mom" placeholder="Full name or nickname"/></div><div class="fg"><label>Type</label><select id="e-type"><option>Baby Shower</option><option>Gender Reveal</option><option>Baby Shower & Gender Reveal</option></select></div></div><div class="fg"><label>Hosted by</label><input id="e-host" placeholder="e.g. The Santos Family / Barkada"/></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 2:00 PM"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input id="e-venue" placeholder="Venue name and full address"/></div><div class="frow"><div class="fg"><label>Theme (optional)</label><input id="e-theme" placeholder="e.g. Woodland, Under the Sea"/></div><div class="fg"><label>Attire (optional)</label><input id="e-dress" placeholder="e.g. Pastel colors"/></div></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Contact number"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. A little one is on the way!"></textarea></div>`},
+  graduation:{title:'&#127891; Graduation details',body:`<div class="frow"><div class="fg"><label>Graduate's full name <span class="req">*</span></label><input id="e-name" placeholder="Full name as on diploma"/></div><div class="fg"><label>Degree / Course <span class="req">*</span></label><input id="e-degree" placeholder="e.g. BS Computer Science"/></div></div><div class="fg"><label>School / University <span class="req">*</span></label><input id="e-school" placeholder="e.g. University of the Philippines Diliman"/></div><div class="fg"><label>Hosted by (optional)</label><input id="e-host" placeholder="e.g. The dela Cruz Family"/></div><div class="frow"><div class="fg"><label>Ceremony date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 9:00 AM"/></div></div><div class="fg"><label>Graduation venue</label><input id="e-venue" placeholder="School venue / auditorium"/></div><div class="fg"><label>Celebration party (if any)</label><input id="e-party" placeholder="e.g. Same day, 6:00 PM at ___ restaurant"/></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Contact number"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. Ang tagal nating hinintay!"></textarea></div>`},
+  anniversary:{title:'&#10084; Anniversary details',body:`<div class="frow"><div class="fg"><label>Husband's name <span class="req">*</span></label><input id="e-husband" placeholder="Full name"/></div><div class="fg"><label>Wife's name <span class="req">*</span></label><input id="e-wife" placeholder="Full name"/></div></div><div class="frow"><div class="fg"><label>Years of marriage</label><input id="e-years" placeholder="e.g. 25 (Silver), 50 (Golden)"/></div><div class="fg"><label>Original wedding date</label><input id="e-origdate" placeholder="e.g. June 14, 2000"/></div></div><div class="fg"><label>Hosted by</label><input id="e-host" placeholder="e.g. Their children and grandchildren"/></div><div class="frow"><div class="fg"><label>Event date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 6:00 PM"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input id="e-venue" placeholder="Venue name and full address"/></div><div class="frow"><div class="fg"><label>Dress code</label><input id="e-dress" placeholder="e.g. Formal, Evening wear"/></div><div class="fg"><label>RSVP deadline</label><input type="date" id="e-rsvpdate"/></div></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Contact number"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. 25 years of love, laughter, and faith..."></textarea></div>`},
+  reunion:{title:'&#128106; Reunion details',body:`<div class="fg"><label>Type of reunion</label><select id="e-rtype"><option>Family reunion</option><option>Batch / Class reunion</option><option>Barkada / Friend group</option><option>Company / Office</option></select></div><div class="fg"><label>Group name / Event title <span class="req">*</span></label><input id="e-group" placeholder="e.g. Dela Cruz Family Reunion / Batch 2001 – 20th Reunion"/></div><div class="fg"><label>Organized by</label><input id="e-org" placeholder="e.g. The Event Committee"/></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 10:00 AM"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input id="e-venue" placeholder="Venue name and full address"/></div><div class="frow"><div class="fg"><label>RSVP deadline</label><input type="date" id="e-rsvpdate"/></div><div class="fg"><label>Attire / Loot bag color</label><input id="e-dress" placeholder="e.g. Family shirt color, Casual"/></div></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Contact number or name"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. It's been 20 years!"></textarea></div>`},
+  corporate:{title:'&#127970; Corporate event details',body:`<div class="frow"><div class="fg"><label>Company name <span class="req">*</span></label><input id="e-company" placeholder="Full company name"/></div><div class="fg"><label>Event name / Title <span class="req">*</span></label><input id="e-event" placeholder="e.g. Annual Awards Night 2026"/></div></div><div class="fg"><label>Event type</label><select id="e-type"><option>Awards Night</option><option>Gala / Dinner</option><option>Seminar / Conference</option><option>Christmas Party</option><option>Company Anniversary</option><option>Other</option></select></div><div class="fg"><label>Invited by</label><input id="e-from" placeholder="e.g. The Management / HR Department"/></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 6:00 PM (Cocktails at 5:30 PM)"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input id="e-venue" placeholder="Hotel or venue name and full address"/></div><div class="frow"><div class="fg"><label>Dress code <span class="req">*</span></label><input id="e-dress" placeholder="e.g. Black tie, Business formal"/></div><div class="fg"><label>RSVP deadline</label><input type="date" id="e-rsvpdate"/></div></div><div class="fg"><label>RSVP to</label><input id="e-rsvp" placeholder="HR email or contact person"/></div><div class="fg"><label>Special instructions (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. Valet parking available, Seat plan at entrance..."></textarea></div>`},
+  fiesta:{title:'&#127881; Fiesta / Party details',body:`<div class="fg"><label>Name of fiesta / event <span class="req">*</span></label><input id="e-name" placeholder="e.g. Pista ng Barangay Sta. Cruz / Birthday Fiesta ni Aling Nena"/></div><div class="fg"><label>Patron saint / Theme</label><input id="e-patron" placeholder="e.g. Sto. Nino, Summer Fiesta"/></div><div class="fg"><label>Hosted by</label><input id="e-host" placeholder="e.g. Barangay Council / The dela Cruz Family"/></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 12:00 NN onwards"/></div></div><div class="fg"><label>Venue / Place <span class="req">*</span></label><input id="e-venue" placeholder="Full address / barangay hall / residence"/></div><div class="fg"><label>Program / Activities (optional)</label><textarea id="e-program" rows="2" placeholder="e.g. Mass, lunch, games, raffle, videoke"></textarea></div><div class="fg"><label>RSVP / Contact (optional)</label><input id="e-rsvp" placeholder="Contact number"/></div><div class="fg"><label>Special message (optional)</label><textarea id="e-msg" rows="2" placeholder="e.g. Lahat ay inaanyayahan! Libre ang pagkain!"></textarea></div>`},
+  kasalan:{title:'&#128149; Kasalan sa Simbahan',body:`<div class="frow"><div class="fg"><label>Pangalan ng lalaki <span class="req">*</span></label><input id="e-groom" placeholder="Buong pangalan"/></div><div class="fg"><label>Pangalan ng babae <span class="req">*</span></label><input id="e-bride" placeholder="Buong pangalan"/></div></div><div class="fg"><label>Magulang ng lalaki</label><input id="e-pgroom" placeholder="Ginoo at Ginang na dela Cruz"/></div><div class="fg"><label>Magulang ng babae</label><input id="e-pbride" placeholder="Ginoo at Ginang na Santos"/></div><div class="fg"><label>Ninong at Ninang (optional)</label><textarea id="e-sponsors" rows="3" placeholder="Ilista ang mga ninong at ninang, isa bawat linya"></textarea></div><div class="frow"><div class="fg"><label>Petsa ng kasal <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Oras</label><input id="e-time" placeholder="hal. 3:00 ng hapon"/></div></div><div class="fg"><label>Simbahan <span class="req">*</span></label><input id="e-church" placeholder="Pangalan ng simbahan at address"/></div><div class="fg"><label>Lugar ng reception <span class="req">*</span></label><input id="e-reception" placeholder="Pangalan ng venue at address"/></div><div class="frow"><div class="fg"><label>Oras ng reception</label><input id="e-rtime" placeholder="hal. 6:00 ng gabi"/></div><div class="fg"><label>Dress code (optional)</label><input id="e-dress" placeholder="hal. Formal, Semi-formal"/></div></div><div class="fg"><label>RSVP</label><input id="e-rsvp" placeholder="Numero o pangalan"/></div><div class="fg"><label>Espesyal na mensahe (optional)</label><textarea id="e-msg" rows="2" placeholder="hal. Kasama ng aming mga pamilya..."></textarea></div>`},
+  other:{title:'&#10022; Custom event details',body:`<div class="fg"><label>Event name / Title <span class="req">*</span></label><input id="e-name" placeholder="What is the name of your event?"/></div><div class="fg"><label>Description</label><textarea id="e-desc" rows="2" placeholder="Briefly describe the event"></textarea></div><div class="fg"><label>Hosted by</label><input id="e-host" placeholder="Name of host or organizer"/></div><div class="frow"><div class="fg"><label>Date <span class="req">*</span></label><input type="date" id="e-date"/></div><div class="fg"><label>Time</label><input id="e-time" placeholder="e.g. 6:00 PM"/></div></div><div class="fg"><label>Venue <span class="req">*</span></label><input id="e-venue" placeholder="Venue name and full address"/></div><div class="frow"><div class="fg"><label>Dress code (optional)</label><input id="e-dress"/></div><div class="fg"><label>RSVP deadline (optional)</label><input type="date" id="e-rsvpdate"/></div></div><div class="fg"><label>RSVP contact</label><input id="e-rsvp" placeholder="Contact number or name"/></div><div class="fg"><label>Other details</label><textarea id="e-msg" rows="2" placeholder="Anything else for your invitation..."></textarea></div>`}
+};
+
+// ── RENDER ────────────────────────────────────────────────────────
+function renderTemplates() {
+  document.getElementById('tpl-grid').innerHTML = TEMPLATES.map(t => {
+    const dark = ['#1a1a1a','#0d1b3e','#000'].includes(t.bg);
+    return `<div class="tc" id="tc-${t.id}" onclick="pickTemplate('${t.id}')">
+      <div class="tc-check">&#10003;</div>
+      <div class="tc-swatch" style="background:${t.bg};color:${t.oc};">${t.orn}</div>
+      <div class="tc-info"><div class="tc-name">${t.name}</div><div class="tc-mood">${t.mood}</div></div>
+    </div>`;
+  }).join('');
+}
+
+function pickEvent(id, el) {
+  state.event = id;
+  document.querySelectorAll('.ec').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('s1next').disabled = false;
+}
+
+function pickTemplate(id) {
+  state.template = id;
+  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('tc-'+id).classList.add('sel');
+  document.getElementById('s2next').disabled = false;
+}
+
+function goStep(n) {
+  if (n===3) loadForm();
+  [1,2,3,4,5,6].forEach(i=>{
+    const el=document.getElementById('s'+i);
+    if(el) el.classList.toggle('hidden',i!==n);
+  });
+  [1,2,3,4,5].forEach(i=>{
+    const ps=document.getElementById('ps'+i);
+    if(ps){ps.classList.toggle('active',i===n);ps.classList.toggle('done',i<n);}
+  });
+  document.getElementById('progress').classList.toggle('hidden',n===6);
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function loadForm() {
+  const ef = EF[state.event]||EF['other'];
+  document.getElementById('ef-title').innerHTML=ef.title;
+  document.getElementById('ef-body').innerHTML=ef.body;
+}
+
+function changeQty(d) {
+  let q=parseInt(document.getElementById('o-qty').value)+d;
+  if(q<20)q=20;if(q>1000)q=1000;
+  document.getElementById('o-qty').value=q;
+  document.getElementById('qty-d').textContent=q;
+}
+
+function gv(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+
+function validateStep3(){
+  const req=['c-name','c-phone','c-email'];
+  let ok=true;
+  req.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el&&!el.value.trim()){el.style.borderColor='var(--red)';ok=false;}
+    else if(el) el.style.borderColor='';
+  });
+  const ed=document.getElementById('e-date');
+  if(ed&&!ed.value){ed.style.borderColor='var(--red)';ok=false;}
+  else if(ed) ed.style.borderColor='';
+  if(!ok)alert('Please fill in all required fields marked with *.');
+  return ok;
+}
+
+function collectAll(){
+  const v={};
+  document.querySelectorAll('#s3 input,#s3 textarea,#s3 select').forEach(el=>{
+    if(el.id&&el.value.trim()) v[el.id]=el.value.trim();
+  });
+  return v;
+}
+
+// ── GENERATE INVITATION ──────────────────────────────────────────
+async function goGenerate(){
+  if(!validateStep3()) return;
+  goStep(4);
+  animateGenSteps();
+  const v=collectAll();
+  const t=TEMPLATES.find(x=>x.id===state.template);
+  const eventNames={wedding:'Wedding',debut:'Debut / Sweet 18',birthday:'Birthday',christening:'Christening / Baptism',babyshower:'Baby Shower',graduation:'Graduation',anniversary:'Anniversary',reunion:'Reunion',corporate:'Corporate Event',fiesta:'Fiesta / Party',kasalan:'Kasalan sa Simbahan',other:'Custom Event'};
+
+  const details=Object.entries(v).filter(([k])=>!k.startsWith('o-')&&!k.startsWith('c-'))
+    .map(([k,val])=>k+': '+val).join('\n');
+
+  const prompt=`Create a COMPLETE print-ready HTML invitation for a ${eventNames[state.event]||state.event} in the Philippines.
+
+EVENT DETAILS:
+${details}
+
+ORDER INFO:
+- Customer: ${v['c-name']||''}
+- Color preference: ${v['o-color']||'use template default'}
+- Paper size: ${v['o-size']||'A5'}
+
+TEMPLATE CSS TO USE AS BASE:
+${t.css}
+
+REQUIREMENTS:
+- Complete HTML document (DOCTYPE, html, head, body)
+- A4 page layout, card centered, appropriate background
+- Load Google Fonts matching the template aesthetic
+- Add beautiful SVG decorative elements (ornaments, borders, flourishes) matching the style
+- Display ALL event details in proper Philippine invitation format
+- For weddings/kasalan: include ninong/ninang list if provided, church + reception details
+- For debut: include 18 roses/candles if provided
+- For christening: include Bible verse if provided, ninong/ninang if provided
+- Use formal Filipino invitation language conventions
+- @media print: correct margins (10mm), preserve colors
+- NO watermarks, NO branding text
+- OUTPUT: Only the complete HTML. No markdown. No explanation.`;
+
+  try{
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4000,
+        system:`You are a premium invitation designer specializing in Philippine events. Output ONLY a complete raw HTML document — no markdown, no backticks, no explanation.
+
+CRITICAL FORMAT — PREMIUM FOLDED INVITATION CARD:
+Show TWO cards side by side (Cover + Inside) on a dark desk background.
+
+PAGE LAYOUT:
+- body: margin:0; padding:28px 16px; background:#1e1a16; display:flex; align-items:flex-start; justify-content:center; gap:20px; flex-wrap:wrap; min-height:100vh;
+- Each card section has a label above it (font-size:9px; color:rgba(255,255,255,.3); text-align:center; margin-bottom:6px; letter-spacing:.12em; text-transform:uppercase;)
+- LEFT = "Cover" label + Cover SVG card
+- RIGHT = "Inside" label + Inside SVG card
+
+CARD SPECIFICATIONS (CRITICAL):
+- Each card is an SVG: width="240" height="340" — A5 proportions
+- box-shadow: 6px 10px 30px rgba(0,0,0,.6) on each card
+- Use INLINE SVG (not img tags) for full rendering
+
+COVER CARD (left) — PREMIUM DECORATIVE DESIGN:
+Must look like a luxury printed invitation cover. Include ALL of these:
+1. Dark richly colored background matching template theme (deep navy, burgundy, forest green, black, etc.)
+2. Double or triple border frame with decorative corner ornaments (L-shaped corner accents with dots)
+3. Large central mandala OR floral medallion made of SVG shapes (circles, ellipses for petals, diamond points) — fills center of card
+4. Floral/botanical arch at top AND bottom (SVG ellipses arranged as petals/leaves)
+5. Side vine/floral decorations along left and right edges
+6. Text at bottom: event type label (7px, letter-spacing, uppercase, gold/accent color), then main name(s) in large elegant script/serif (18-22px), then date (7px)
+7. Thin horizontal divider line with center dot between elements
+8. Color palette: dark background + gold (#c8a860 or #f7c948) OR rose gold (#e8a0c0) OR silver-blue (#7ab0d8) accents
+
+INSIDE CARD (right) — ALL EVENT DETAILS:
+- Light/cream background matching template
+- Same border frame + corner ornaments as cover (lighter version)
+- Top ornament (small floral motif)
+- ALL event information in proper Philippine invitation format:
+  * Header: "together with their families" / "proudly present" / hosted by
+  * Main names: 17-20px serif or script font
+  * Date: bold 8-9px
+  * Church/venue details
+  * Reception box (slightly tinted background rectangle)
+  * Sponsors/Ninong/Ninang box (if provided)
+  * Bible verse box with left border (for christenings)
+  * Bottom ornament + RSVP line
+- Text sizes: names 17-20px, headings 8-9px, body 7-7.5px, labels 6-6.5px
+
+TYPOGRAPHY: Load Google Fonts (Cormorant Garamond, Playfair Display, Tangerine, Dancing Script, Great Vibes, etc.) matching the event type.
+
+@media print { body { background: white; } } — each card on its own A5 page.
+OUTPUT: Complete HTML file only. Nothing else.`,
+        messages:[{role:'user',content:prompt}]})});
+    const d=await r.json();
+    let html=d.content.filter(b=>b.type==='text').map(b=>b.text).join('').replace(/^```html\s*/i,'').replace(/^```\s*/i,'').replace(/```\s*$/,'').trim();
+    if(!html.includes('<html')&&!html.includes('<!DOCTYPE')) throw new Error('bad');
+    state.generatedHTML=html;
+    goStep(5);
+    document.getElementById('inv-frame').srcdoc=html;
+    const ev=eventNames[state.event]||state.event;
+    document.getElementById('prev-info').textContent=ev+' · '+t.name+' style';
+  }catch(e){
+    alert('Generation failed. Please try again.');
+    goStep(3);
+  }
+}
+
+function animateGenSteps(){
+  const steps=['gs1','gs2','gs3','gs4'];
+  steps.forEach((id,i)=>{
+    setTimeout(()=>{
+      if(i>0) document.getElementById(steps[i-1]).classList.replace('active','done');
+      document.getElementById(id).classList.add('active');
+    },i*1400);
+  });
+}
+
+function regenInvite(){
+  goStep(3);
+  setTimeout(goGenerate,100);
+}
+
+function printPreview(){
+  if(!state.generatedHTML)return;
+  const w=window.open('','_blank');
+  w.document.write(state.generatedHTML);
+  w.document.close();
+  w.onload=()=>w.print();
+}
+
+// ── SUBMIT ───────────────────────────────────────────────────────
+function submitOrder(){
+  const v=collectAll();
+  const eventNames={wedding:'Wedding',debut:'Debut / Sweet 18',birthday:'Birthday',christening:'Christening',babyshower:'Baby Shower',graduation:'Graduation',anniversary:'Anniversary',reunion:'Reunion',corporate:'Corporate Event',fiesta:'Fiesta / Party',kasalan:'Kasalan sa Simbahan',other:'Custom Event'};
+  const t=TEMPLATES.find(x=>x.id===state.template);
+  const ref='IF-'+Date.now().toString().slice(-6);
+  document.getElementById('ref-num').textContent=ref;
+
+  const orders=JSON.parse(localStorage.getItem('if_orders')||'[]');
+  orders.unshift({
+    ref,ts:new Date().toISOString(),
+    event:state.event,eventLabel:eventNames[state.event]||state.event,
+    template:state.template,templateLabel:t?t.name:state.template,
+    contact:{name:v['c-name'],phone:v['c-phone'],email:v['c-email'],city:v['c-city']||''},
+    order:{qty:v['o-qty']||'50',size:v['o-size']||'A5',color:v['o-color']||'',delivery:v['o-delivery']||'Pick up',notes:v['o-notes']||''},
+    eventDetails:v,
+    generatedHTML:state.generatedHTML,
+    status:'New'
+  });
+  localStorage.setItem('if_orders',JSON.stringify(orders));
+  goStep(6);
+}
+
+function resetFlow(){
+  state={event:null,template:null,qty:50,generatedHTML:''};
+  document.querySelectorAll('.ec').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.tc').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('s1next').disabled=true;
+  document.getElementById('s2next').disabled=true;
+  goStep(1);
+}
+
+renderTemplates();
+</script>
+</body>
+</html>
